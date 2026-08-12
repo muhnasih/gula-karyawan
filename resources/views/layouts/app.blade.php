@@ -824,11 +824,16 @@
 
                 width: 100%;
 
-                max-height: none;
+                max-height: calc(100vh - var(--pg-navbar-height));
+
+                overflow-y: auto;
 
                 border-right: 0;
 
-                box-shadow: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+                box-shadow:
+                    0 10px 25px rgba(16, 71, 45, 0.15);
             }
 
 
@@ -970,7 +975,7 @@
         SIDEBAR + CONTENT
     ========================================================== --}}
 
-    <div class="d-flex">
+    <div class="d-flex flex-column flex-lg-row">
 
 
         {{-- =====================================================
