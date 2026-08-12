@@ -2,7 +2,7 @@
     SIDEBAR PG GENDING
 ========================================================= --}}
 
-<div class="d-flex flex-column min-vh-100">
+<div class="d-flex flex-column h-100">
 
 
     {{-- =====================================================
@@ -14,6 +14,7 @@
         <div class="d-flex align-items-center">
 
             {{-- Logo --}}
+
             <div
                 style="
                     width: 45px;
@@ -28,27 +29,36 @@
                     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
                 "
             >
+
                 <i class="bi bi-buildings-fill fs-4"></i>
+
             </div>
 
 
             {{-- Judul --}}
-            <div class="ms-3">
+
+            <div class="ms-3 overflow-hidden">
 
                 <div
-                    class="text-white fw-bold"
+                    class="text-white fw-bold text-truncate"
                     style="font-size: 0.95rem;"
                 >
+
                     PG GENDING
+
                 </div>
 
+
                 <div
+                    class="text-truncate"
                     style="
                         color: rgba(255,255,255,0.65);
                         font-size: 0.68rem;
                     "
                 >
+
                     Sistem Pengambilan Gula
+
                 </div>
 
             </div>
@@ -86,6 +96,7 @@
 
         @auth('web')
 
+
             {{-- =================================================
                 ADMIN
             ================================================== --}}
@@ -96,6 +107,7 @@
 
 
                     {{-- Section --}}
+
                     <div
                         class="text-uppercase small opacity-75 mb-2 text-white"
                         style="
@@ -105,8 +117,11 @@
                             letter-spacing: 0.8px;
                         "
                     >
+
                         Menu Admin
+
                     </div>
+
 
 
                     {{-- =========================================
@@ -115,12 +130,11 @@
 
                     <a
                         href="{{ route('admin.karyawan') }}"
-                        class="nav-link
-                               mb-1
-                               {{ request()->routeIs('admin.karyawan')
-                                  || request()->routeIs('admin.karyawan.show')
-                                  ? 'active'
-                                  : '' }}"
+                        class="nav-link mb-1
+                        {{ request()->routeIs('admin.karyawan')
+                            || request()->routeIs('admin.karyawan.show')
+                            ? 'active'
+                            : '' }}"
                     >
 
                         <i class="bi bi-people-fill"></i>
@@ -132,17 +146,17 @@
                     </a>
 
 
+
                     {{-- =========================================
                         LAPORAN
                     ========================================== --}}
 
                     <a
                         href="{{ route('admin.laporan.index') }}"
-                        class="nav-link
-                               mb-1
-                               {{ request()->routeIs('admin.laporan.*')
-                                  ? 'active'
-                                  : '' }}"
+                        class="nav-link mb-1
+                        {{ request()->routeIs('admin.laporan.*')
+                            ? 'active'
+                            : '' }}"
                     >
 
                         <i class="bi bi-file-earmark-bar-graph"></i>
@@ -154,17 +168,17 @@
                     </a>
 
 
+
                     {{-- =========================================
-                        KELOLA USER
+                        KELOLA OPERATOR
                     ========================================== --}}
 
                     <a
                         href="{{ route('admin.operator.index') }}"
-                        class="nav-link
-                               mb-1
-                               {{ request()->routeIs('admin.user.*')
-                                  ? 'active'
-                                  : '' }}"
+                        class="nav-link mb-1
+                        {{ request()->routeIs('admin.operator.*')
+                            ? 'active'
+                            : '' }}"
                     >
 
                         <i class="bi bi-person-gear"></i>
@@ -192,6 +206,7 @@
 
 
                     {{-- Section --}}
+
                     <div
                         class="text-uppercase small opacity-75 mb-2 text-white"
                         style="
@@ -201,8 +216,11 @@
                             letter-spacing: 0.8px;
                         "
                     >
+
                         Menu Operator
+
                     </div>
+
 
 
                     {{-- =========================================
@@ -211,11 +229,10 @@
 
                     <a
                         href="{{ route('operator.dashboard') }}"
-                        class="nav-link
-                               mb-1
-                               {{ request()->routeIs('operator.dashboard')
-                                  ? 'active'
-                                  : '' }}"
+                        class="nav-link mb-1
+                        {{ request()->routeIs('operator.dashboard')
+                            ? 'active'
+                            : '' }}"
                     >
 
                         <i class="bi bi-speedometer2"></i>
@@ -226,9 +243,11 @@
 
                     </a>
 
+
                 </div>
 
             @endif
+
 
         @endauth
 
@@ -244,6 +263,7 @@
 
 
                 {{-- Section --}}
+
                 <div
                     class="text-uppercase small opacity-75 mb-2 text-white"
                     style="
@@ -253,8 +273,11 @@
                         letter-spacing: 0.8px;
                     "
                 >
+
                     Menu Karyawan
+
                 </div>
+
 
 
                 {{-- =============================================
@@ -263,11 +286,10 @@
 
                 <a
                     href="{{ route('karyawan.dashboard') }}"
-                    class="nav-link
-                           mb-1
-                           {{ request()->routeIs('karyawan.dashboard')
-                              ? 'active'
-                              : '' }}"
+                    class="nav-link mb-1
+                    {{ request()->routeIs('karyawan.dashboard')
+                        ? 'active'
+                        : '' }}"
                 >
 
                     <i class="bi bi-house-door-fill"></i>
@@ -283,6 +305,7 @@
 
         @endauth
 
+
     </div>
 
 
@@ -295,6 +318,7 @@
 
 
         {{-- Garis --}}
+
         <div
             style="
                 height: 1px;
@@ -302,6 +326,7 @@
                 margin-bottom: 1rem;
             "
         ></div>
+
 
 
         {{-- =================================================
@@ -319,7 +344,9 @@
                 "
             >
 
+
                 {{-- Avatar --}}
+
                 <div
                     style="
                         width: 38px;
@@ -339,15 +366,20 @@
                 </div>
 
 
+
                 {{-- User --}}
+
                 <div class="ms-2 overflow-hidden">
 
                     <div
                         class="text-white fw-semibold text-truncate"
                         style="font-size: 0.82rem;"
                     >
+
                         {{ auth()->user()->nama_lengkap ?? auth()->user()->username }}
+
                     </div>
+
 
                     <div
                         style="
@@ -356,7 +388,9 @@
                             text-transform: capitalize;
                         "
                     >
+
                         {{ auth()->user()->role }}
+
                     </div>
 
                 </div>
@@ -364,7 +398,9 @@
             </div>
 
 
+
             {{-- Logout --}}
+
             <form
                 method="POST"
                 action="{{ route('logout') }}"
@@ -410,7 +446,9 @@
                 "
             >
 
+
                 {{-- Avatar --}}
+
                 <div
                     style="
                         width: 38px;
@@ -430,15 +468,20 @@
                 </div>
 
 
+
                 {{-- User --}}
+
                 <div class="ms-2 overflow-hidden">
 
                     <div
                         class="text-white fw-semibold text-truncate"
                         style="font-size: 0.82rem;"
                     >
+
                         {{ auth('karyawan')->user()->nama ?? 'Karyawan' }}
+
                     </div>
+
 
                     <div
                         style="
@@ -446,7 +489,9 @@
                             font-size: 0.68rem;
                         "
                     >
+
                         Karyawan
+
                     </div>
 
                 </div>
@@ -454,7 +499,9 @@
             </div>
 
 
+
             {{-- Logout Karyawan --}}
+
             <form
                 method="POST"
                 action="{{ route('karyawan.logout') }}"
@@ -485,5 +532,6 @@
 
 
     </div>
+
 
 </div>

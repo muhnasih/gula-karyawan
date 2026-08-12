@@ -94,15 +94,6 @@ class KaryawanController extends Controller
 
 
     /**
-     * Menampilkan detail karyawan
-     */
-    public function show(Karyawan $karyawan)
-    {
-        return view('admin.karyawan.show', compact('karyawan'));
-    }
-
-
-    /**
      * Form edit karyawan
      */
     public function edit(Karyawan $karyawan)
@@ -136,7 +127,7 @@ class KaryawanController extends Controller
         $karyawan->update($validated);
 
         return redirect()
-            ->route('admin.karyawan.show', $karyawan->id)
+            ->route('admin.karyawan')
             ->with('success', 'Data karyawan berhasil diperbarui.');
     }
 

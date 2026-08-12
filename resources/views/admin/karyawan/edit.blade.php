@@ -20,7 +20,7 @@
             </p>
         </div>
 
-        <a href="{{ route('admin.karyawan.show', $karyawan->id) }}"
+        <a href="{{ route('admin.karyawan') }}"
            class="btn btn-secondary">
 
             <i class="bi bi-arrow-left me-1"></i>
@@ -255,7 +255,7 @@
                 <div class="d-flex justify-content-end gap-2">
 
                     <a
-                        href="{{ route('admin.karyawan.show', $karyawan->id) }}"
+                        href="{{ route('admin.karyawan') }}"
                         class="btn btn-secondary"
                     >
 

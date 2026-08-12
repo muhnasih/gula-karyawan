@@ -127,78 +127,120 @@
 
 
 {{-- DAFTAR KARYAWAN --}}
-<div class="row">
+<div class="card shadow-sm border-0">
 
-    @forelse ($karyawan as $item)
+    <div class="table-responsive">
 
-        <div class="col-md-6 mb-3">
+        <table class="table table-bordered table-hover align-middle mb-0">
 
-            <div class="card shadow-sm border-0">
+            <thead class="table-light">
+                <tr>
+                    <th>NIK</th>
+                    <th>NAMA</th>
+                    <th>JABATAN</th>
+                    <th>BAGIAN</th>
+                    <th>STATUS</th>
+                    <th>KATEGORI</th>
+                    <th class="text-center">AKSI</th>
+                </tr>
+            </thead>
 
-                <div class="card-body d-flex align-items-center">
+            <tbody>
 
-                    <div
-                        class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 55px; height: 55px;"
-                    >
+                @forelse ($karyawan as $item)
 
-                        <i class="bi bi-person-fill fs-3"></i>
+                    <tr>
+                        <td>{{ $item->nik }}</td>
 
-                    </div>
+                        <td class="fw-semibold">{{ $item->nama }}</td>
 
+                        <td>{{ $item->jabatan ?? '-' }}</td>
+                        <td>{{ $item->bagian ?? '-' }}</td>
 
-                    <div class="ms-3">
+                        <td>
+                            @if ($item->status)
 
-                        <h5 class="fw-bold mb-1">
+                                @if (strtolower($item->status) === 'aktif')
+
+                                    <span class="badge bg-success">
+                                        {{ $item->status }}
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-secondary">
+                                        {{ $item->status }}
+                                    </span>
+
+                                @endif
+
+                            @else
+
+                                <span class="text-muted">-</span>
+
+                            @endif
+                        </td>
+
+                        <td>
+                            @if ($item->kategori)
+
+                                <span class="badge bg-primary">
+                                    {{ $item->kategori }}
+                                </span>
+
+                            @else
+
+                                <span class="text-muted">-</span>
+
+                            @endif
+                        </td>
+
+                        <td class="text-center">
 
                             <a
-                                href="{{ route('admin.karyawan.show', $item->id) }}"
-                                class="text-decoration-none text-dark"
+                                href="{{ route('admin.karyawan.edit', $item->id) }}"
+                                class="btn btn-sm btn-outline-warning"
+                                title="Edit"
                             >
-
-                                {{ $item->nama }}
-
+                                <i class="bi bi-pencil-square"></i>
                             </a>
 
-                        </h5>
+                            <form
+                                action="{{ route('admin.karyawan.destroy', $item->id) }}"
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data {{ addslashes($item->nama) }}?');"
+                            >
+                                @csrf
+                                @method('DELETE')
 
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Hapus"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
 
-                        <div class="text-muted">
+                        </td>
+                    </tr>
 
-                            NIK: {{ $item->nik }}
+                @empty
 
-                        </div>
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            Belum ada data karyawan.
+                        </td>
+                    </tr>
 
+                @endforelse
 
-                        <div class="small">
+            </tbody>
 
-                            {{ $item->kategori ?? '-' }}
+        </table>
 
-                            &middot;
-
-                            {{ $item->status ?? '-' }}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    @empty
-
-        <div class="col-12">
-
-            <p class="text-muted">
-                Belum ada data karyawan.
-            </p>
-
-        </div>
-
-    @endforelse
+    </div>
 
 </div>
 
