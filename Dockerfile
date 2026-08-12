@@ -28,6 +28,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Pastikan hanya satu MPM yang aktif (fix "More than one MPM loaded")
+RUN a2dismod mpm_event || true \
+    && a2enmod mpm_prefork
+
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
