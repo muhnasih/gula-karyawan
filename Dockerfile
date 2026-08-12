@@ -1,6 +1,8 @@
 FROM php:8.2-apache
 
-# Install dependencies
+# =========================================================
+# Install system dependencies & PHP extensions
+# =========================================================
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -28,58 +30,101 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Pastikan hanya mpm_prefork yang aktif (fix "More than one MPM loaded")
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
-           /etc/apache2/mods-enabled/mpm_event.conf \
-           /etc/apache2/mods-enabled/mpm_worker.load \
-           /etc/apache2/mods-enabled/mpm_worker.conf \
-    && a2enmod mpm_prefork
 
-# Enable Apache rewrite
-RUN a2enmod rewrite
+# =========================================================
+# Apache MPM
+# Pastikan hanya mpm_prefork yang aktif
+# =========================================================
+RUN a2dismod mpm_event mpm_worker mpm_prefork || true \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite
 
-# Set working directory
+
+# =========================================================
+# Working directory
+# =========================================================
 WORKDIR /var/www/html
 
-# Install Composer
+
+# =========================================================
+# Composer
+# =========================================================
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy project
+
+# =========================================================
+# Copy Laravel project
+# =========================================================
 COPY . .
 
-# Install PHP dependencies
+
+# =========================================================
+# Install Laravel dependencies
+# =========================================================
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction
 
+
+# =========================================================
 # Install frontend dependencies
+# =========================================================
 RUN npm install
 
+
+# =========================================================
 # Build Vite
+# =========================================================
 RUN npm run build
 
-# Set Laravel permissions
+
+# =========================================================
+# Laravel permissions
+# =========================================================
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Apache Laravel configuration
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
-RUN printf '<Directory /var/www/html/public>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>\n' > /etc/apache2/conf-available/laravel.conf
+# =========================================================
+# Apache Laravel configuration
+# =========================================================
+
+# Laravel menggunakan folder public sebagai DocumentRoot
+RUN sed -i \
+    's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' \
+    /etc/apache2/sites-available/000-default.conf
+
+
+# Izinkan Laravel .htaccess
+RUN printf '%s\n' \
+    '<Directory /var/www/html/public>' \
+    '    AllowOverride All' \
+    '    Require all granted' \
+    '</Directory>' \
+    > /etc/apache2/conf-available/laravel.conf
+
 
 RUN a2enconf laravel
 
-# Railway uses PORT
-RUN printf '#!/bin/sh\n\
-sed -i "s/Listen 80/Listen ${PORT:-8080}/" /etc/apache2/ports.conf\n\
-sed -i "s/:80>/:${PORT:-8080}>/" /etc/apache2/sites-available/000-default.conf\n\
-apache2-foreground\n' > /usr/local/bin/start-laravel.sh
+
+# =========================================================
+# Railway PORT
+# =========================================================
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'PORT=${PORT:-8080}' \
+    'sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf' \
+    'sed -i "s/:80>/:${PORT}>/" /etc/apache2/sites-available/000-default.conf' \
+    'exec apache2-foreground' \
+    > /usr/local/bin/start-laravel.sh
+
 
 RUN chmod +x /usr/local/bin/start-laravel.sh
 
+
+# =========================================================
+# Start Laravel / Apache
+# =========================================================
 CMD ["/usr/local/bin/start-laravel.sh"]
