@@ -110,6 +110,10 @@ RUN printf '%s\n' \
     'PORT=${PORT:-8080}' \
     'sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf' \
     'sed -i "s/:80>/:${PORT}>/" /etc/apache2/sites-available/000-default.conf' \
+    'echo "=== ENFORCING SINGLE MPM (prefork) ==="' \
+    'a2dismod -f mpm_event mpm_worker mpm_prefork >/dev/null 2>&1 || true' \
+    'rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* /etc/apache2/mods-enabled/mpm_prefork.*' \
+    'a2enmod mpm_prefork >/dev/null 2>&1' \
     'echo "=== FINAL APACHE MPM CHECK ==="' \
     'apache2ctl -M | grep mpm' \
     'echo "=== STARTING APACHE ==="' \
