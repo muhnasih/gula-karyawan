@@ -159,7 +159,7 @@
                     ========================================== --}}
 
                     <a
-                        href="{{ route('admin.user.index') }}"
+                        href="{{ route('admin.operator.index') }}"
                         class="nav-link
                                mb-1
                                {{ request()->routeIs('admin.user.*')
@@ -170,7 +170,7 @@
                         <i class="bi bi-person-gear"></i>
 
                         <span>
-                            Kelola User
+                            Kelola Operator
                         </span>
 
                     </a>

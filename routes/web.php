@@ -195,12 +195,34 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | USER
+            | OPERATOR (Data User dengan role operator)
             |--------------------------------------------------------------------------
             */
 
-            Route::get('/user', [UserController::class, 'index'])
-                ->name('user.index');
+            // Halaman utama daftar operator
+            Route::get('/operator', [UserController::class, 'index'])
+                ->name('operator.index');
+
+
+            // Tambah operator
+            Route::get('/operator/create', [UserController::class, 'create'])
+                ->name('operator.create');
+
+            Route::post('/operator', [UserController::class, 'store'])
+                ->name('operator.store');
+
+
+            // Edit operator
+            Route::get('/operator/{user}/edit', [UserController::class, 'edit'])
+                ->name('operator.edit');
+
+            Route::put('/operator/{user}', [UserController::class, 'update'])
+                ->name('operator.update');
+
+
+            // Hapus operator
+            Route::delete('/operator/{user}', [UserController::class, 'destroy'])
+                ->name('operator.destroy');
 
         });
 
