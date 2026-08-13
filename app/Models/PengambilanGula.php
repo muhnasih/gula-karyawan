@@ -13,13 +13,13 @@ class PengambilanGula extends Model
 
     protected $fillable = [
         'karyawan_id',
-        'periode',
         'tanggal_ambil',
-        'discan_oleh',
+        'jumlah_gula',
     ];
 
     protected $casts = [
         'tanggal_ambil' => 'date',
+        'jumlah_gula' => 'integer',
     ];
 
 
@@ -40,15 +40,24 @@ class PengambilanGula extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Relasi ke Operator/User
+    | Menentukan jumlah gula berdasarkan status karyawan
     |--------------------------------------------------------------------------
     */
 
-    public function operator()
+    public function getJumlahGulaAttribute($value)
     {
-        return $this->belongsTo(
-            User::class,
-            'discan_oleh'
-        );
+        if ($value !== null) {
+            return $value;
+        }
+
+        if ($this->karyawan) {
+            return match (strtolower(trim($this->karyawan->status))) {
+                'karpim' => 10,
+                'karpel' => 5,
+                default => 0,
+            };
+        }
+
+        return 0;
     }
 }

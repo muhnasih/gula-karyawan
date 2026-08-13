@@ -40,8 +40,13 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) {
                 return (object) [
-                    'nik'  => $item->karyawan->nik ?? '-',
+                    'nik' => $item->karyawan->nik ?? '-',
                     'nama' => $item->karyawan->nama ?? '-',
+                    'status' => $item->karyawan->status ?? '-',
+                    'tanggal_ambil' => $item->tanggal_ambil
+                        ? Carbon::parse($item->tanggal_ambil)->format('d-m-Y')
+                        : '-',
+                    'jumlah_gula' => $item->jumlah_gula ?? 0,
                 ];
             });
 

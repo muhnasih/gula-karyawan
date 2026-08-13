@@ -51,8 +51,13 @@ class OperatorStatistikController extends Controller
         // =========================================================
         // TOTAL KARYAWAN
         // =========================================================
+        // Hanya hitung karyawan aktif, karena hanya karyawan aktif
+        // yang bisa melakukan pengambilan gula (lihat ScanController).
+        // Jika ikut menghitung karyawan nonaktif, statistik
+        // "belum mengambil" akan salah / terlalu besar.
+        // =========================================================
 
-        $totalKaryawan = Karyawan::count();
+        $totalKaryawan = Karyawan::aktif()->count();
 
 
         // =========================================================
@@ -182,10 +187,16 @@ class OperatorStatistikController extends Controller
 
 
         // =========================================================
-        // PENGAMBILAN PER KATEGORI
+        // PENGAMBILAN PER STATUS KARYAWAN
+        // =========================================================
+        // Sebelumnya dikelompokkan berdasarkan 'kategori' (Tetap/OS/
+        // KAMP-PKWT), padahal jatah gula sebenarnya ditentukan oleh
+        // kolom 'status' (KARPIM/KARPEL). Diganti supaya laporan ini
+        // mencerminkan pengelompokan yang benar-benar dipakai untuk
+        // menentukan jumlah jatah gula.
         // =========================================================
 
-        $perKategori = (clone $pengambilanQuery)
+        $perStatus = (clone $pengambilanQuery)
             ->with('karyawan')
             ->get()
             ->filter(function ($item) {
@@ -195,14 +206,14 @@ class OperatorStatistikController extends Controller
             })
             ->groupBy(function ($item) {
 
-                return $item->karyawan->kategori
-                    ?: 'Tidak Ada Kategori';
+                return $item->karyawan->status
+                    ?: 'Tidak Ada Status';
 
             })
-            ->map(function ($items, $kategori) {
+            ->map(function ($items, $status) {
 
                 return [
-                    'kategori' => $kategori,
+                    'status' => $status,
                     'total' => $items->count(),
                 ];
 
@@ -234,11 +245,15 @@ class OperatorStatistikController extends Controller
         // =========================================================
         // KARYAWAN YANG BELUM MENGAMBIL
         // =========================================================
+        // Dibatasi hanya karyawan aktif, konsisten dengan
+        // $totalKaryawan di atas.
+        // =========================================================
 
-        $karyawanBelumAmbil = Karyawan::whereNotIn(
-            'id',
-            $karyawanSudahAmbilIds
-        )
+        $karyawanBelumAmbil = Karyawan::aktif()
+            ->whereNotIn(
+                'id',
+                $karyawanSudahAmbilIds
+            )
             ->orderBy('nama')
             ->get();
 
@@ -279,7 +294,7 @@ class OperatorStatistikController extends Controller
                 'chartLabels',
                 'chartData',
                 'perBagian',
-                'perKategori',
+                'perStatus',
                 'pengambilanTerbaru',
                 'karyawanBelumAmbil'
             )
