@@ -19,45 +19,24 @@ class PengambilanGula extends Model
 
     protected $casts = [
         'tanggal_ambil' => 'date',
-        'jumlah_gula' => 'integer',
+        'jumlah_gula'   => 'integer',
     ];
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Relasi ke Karyawan
-    |--------------------------------------------------------------------------
-    */
 
     public function karyawan()
     {
-        return $this->belongsTo(
-            Karyawan::class,
-            'karyawan_id'
-        );
+        return $this->belongsTo(Karyawan::class, 'karyawan_id');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Menentukan jumlah gula berdasarkan status karyawan
-    |--------------------------------------------------------------------------
-    */
-
-    public function getJumlahGulaAttribute($value)
+    /**
+     * Helper: menentukan jatah gula berdasarkan kategori karyawan
+     * (bukan accessor, supaya tidak menimpa nilai database)
+     */
+    public static function getJatahByKategori(?string $kategori): int
     {
-        if ($value !== null) {
-            return $value;
-        }
-
-        if ($this->karyawan) {
-            return match (strtolower(trim($this->karyawan->status))) {
-                'karpim' => 10,
-                'karpel' => 5,
-                default => 0,
-            };
-        }
-
-        return 0;
+        return match (strtolower(trim($kategori ?? ''))) {
+            'karpim' => 10,
+            'karpel' => 5,
+            default  => 0,
+        };
     }
 }

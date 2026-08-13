@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Karyawan;
+use App\Models\PengambilanGula; // pastikan model ini sudah ada
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -17,8 +20,13 @@ class DashboardController extends Controller
 
         $pensiun = Karyawan::pensiun()->count();
 
-        // TODO: ganti dengan query relasi tabel pengambilan gula saat sudah dibuat
-        $sudahAmbil = 0;
+        // Hitung karyawan yang sudah ambil gula hari ini
+        $hariIni = Carbon::today();
+
+        $sudahAmbil = PengambilanGula::whereDate('tanggal_ambil', $hariIni)
+            ->distinct('karyawan_id')
+            ->count('karyawan_id');
+
         $belumAmbil = $totalKaryawan - $sudahAmbil;
 
         // TODO: ganti dengan Activity::latest()->take(5)->get() saat tabel log sudah dibuat

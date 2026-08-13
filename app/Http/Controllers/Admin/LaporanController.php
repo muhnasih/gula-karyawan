@@ -8,23 +8,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
-    /**
-     * Menampilkan halaman laporan
-     */
     public function index(Request $request)
     {
         $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik();
+        $statistik = $this->getStatistik($request);
 
         return view('admin.laporan.index', compact('laporan', 'statistik'));
     }
 
-    /**
-     * Export ke Excel
-     */
     public function exportExcel(Request $request)
     {
         return Excel::download(
@@ -33,13 +28,10 @@ class LaporanController extends Controller
         );
     }
 
-    /**
-     * Export ke PDF (versi lama, tetap dipertahankan jika masih dipakai di tempat lain)
-     */
     public function exportPdf(Request $request)
     {
         $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik();
+        $statistik = $this->getStatistik($request);
 
         $pdf = Pdf::loadView('admin.laporan.export.pdf', compact('laporan', 'statistik'));
         $pdf->setPaper('A4', 'landscape');
@@ -47,26 +39,18 @@ class LaporanController extends Controller
         return $pdf->download('laporan-pengambilan-gula.pdf');
     }
 
-    /**
-     * Preview PDF — hanya menampilkan halaman HTML di browser,
-     * TIDAK membuat file PDF dan TIDAK melakukan download.
-     */
     public function previewPdf(Request $request)
     {
         $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik();
+        $statistik = $this->getStatistik($request);
 
         return view('admin.laporan.pdf', compact('laporan', 'statistik'));
     }
 
-    /**
-     * Download PDF — membuat file PDF asli dari view yang sama
-     * dengan preview, lalu langsung didownload.
-     */
     public function downloadPdf(Request $request)
     {
         $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik();
+        $statistik = $this->getStatistik($request);
 
         $pdf = Pdf::loadView('admin.laporan.pdf', compact('laporan', 'statistik'));
         $pdf->setPaper('A4', 'landscape');
@@ -86,7 +70,8 @@ class LaporanController extends Controller
                 'karyawan.nama',
                 'karyawan.kategori',
                 'karyawan.bagian',
-                'pengambilan_gula.tanggal_ambil'
+                'pengambilan_gula.tanggal_ambil',
+                'pengambilan_gula.jumlah_gula'   // ← ditambahkan
             );
 
         // Filter tanggal awal
@@ -99,29 +84,39 @@ class LaporanController extends Controller
             $query->whereDate('pengambilan_gula.tanggal_ambil', '<=', $request->tanggal_akhir);
         }
 
-        // Filter status
-        if ($request->status === 'sudah') {
-            $query->whereNotNull('pengambilan_gula.tanggal_ambil');
-        } elseif ($request->status === 'belum') {
-            $query->whereNull('pengambilan_gula.tanggal_ambil');
-        }
+        // Filter status "sudah" / "belum" diganti jadi filter berdasarkan apakah ada data
+        // Karena ini join ke pengambilan_gula, yang muncul di sini otomatis sudah ambil.
+        // Kalau mau tampilkan yang belum ambil, harus pakai leftJoin + whereNull (lebih kompleks).
 
         return $query->orderBy('karyawan.nama', 'asc');
     }
 
     /**
-     * Get data statistik
+     * Get data statistik (bisa difilter tanggal juga)
      */
-    private function getStatistik()
+    private function getStatistik(Request $request = null)
     {
         $totalKaryawan = DB::table('karyawan')->count();
-        $sudahAmbil    = DB::table('pengambilan_gula')->whereNotNull('tanggal_ambil')->count();
+
+        $sudahAmbilQuery = DB::table('pengambilan_gula')
+            ->select('karyawan_id')
+            ->distinct();
+
+        if ($request && $request->filled('tanggal_awal')) {
+            $sudahAmbilQuery->whereDate('tanggal_ambil', '>=', $request->tanggal_awal);
+        }
+        if ($request && $request->filled('tanggal_akhir')) {
+            $sudahAmbilQuery->whereDate('tanggal_ambil', '<=', $request->tanggal_akhir);
+        }
+
+        $sudahAmbil = $sudahAmbilQuery->count();
 
         return [
             'totalKaryawan' => $totalKaryawan,
             'sudahAmbil'    => $sudahAmbil,
             'belumAmbil'    => $totalKaryawan - $sudahAmbil,
             'pensiun'       => DB::table('karyawan')->where('status', 'pensiun')->count(),
+            'totalGula'     => DB::table('pengambilan_gula')->sum('jumlah_gula'), // bonus
         ];
     }
 }

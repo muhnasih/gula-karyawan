@@ -19,11 +19,13 @@
     </div>
 
     <div class="d-flex gap-2">
-        <a href="{{ route('admin.laporan.excel', request()->query()) }}" class="btn btn-success flex-fill flex-lg-grow-0">
+        <a href="{{ route('admin.laporan.excel', request()->query()) }}"
+           class="btn btn-success flex-fill flex-lg-grow-0">
             <i class="bi bi-file-earmark-excel me-1"></i>
             <span class="d-none d-sm-inline">Export </span>Excel
         </a>
-        <a href="{{ route('admin.laporan.pdf', request()->query()) }}" class="btn btn-danger flex-fill flex-lg-grow-0">
+        <a href="{{ route('admin.laporan.pdf', request()->query()) }}"
+           class="btn btn-danger flex-fill flex-lg-grow-0">
             <i class="bi bi-file-earmark-pdf me-1"></i>
             <span class="d-none d-sm-inline">Export </span>PDF
         </a>
@@ -38,7 +40,9 @@
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-3">
                 <h6 class="text-muted mb-2 small">Total Karyawan</h6>
-                <h3 class="fw-bold text-success mb-0">{{ $statistik['totalKaryawan'] ?? 0 }}</h3>
+                <h3 class="fw-bold text-success mb-0">
+                    {{ $statistik['totalKaryawan'] ?? 0 }}
+                </h3>
             </div>
         </div>
     </div>
@@ -47,7 +51,9 @@
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-3">
                 <h6 class="text-muted mb-2 small">Sudah Mengambil</h6>
-                <h3 class="fw-bold text-primary mb-0">{{ $statistik['sudahAmbil'] ?? 0 }}</h3>
+                <h3 class="fw-bold text-primary mb-0">
+                    {{ $statistik['sudahAmbil'] ?? 0 }}
+                </h3>
             </div>
         </div>
     </div>
@@ -56,7 +62,9 @@
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-3">
                 <h6 class="text-muted mb-2 small">Belum Mengambil</h6>
-                <h3 class="fw-bold text-warning mb-0">{{ $statistik['belumAmbil'] ?? 0 }}</h3>
+                <h3 class="fw-bold text-warning mb-0">
+                    {{ $statistik['belumAmbil'] ?? 0 }}
+                </h3>
             </div>
         </div>
     </div>
@@ -64,8 +72,10 @@
     <div class="col-6 col-md-3">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-3">
-                <h6 class="text-muted mb-2 small">Pensiun</h6>
-                <h3 class="fw-bold text-danger mb-0">{{ $statistik['pensiun'] ?? 0 }}</h3>
+                <h6 class="text-muted mb-2 small">Total Gula (KG)</h6>
+                <h3 class="fw-bold text-info mb-0">
+                    {{ number_format($statistik['totalGula'] ?? 0) }}
+                </h3>
             </div>
         </div>
     </div>
@@ -80,20 +90,30 @@
             <div class="row g-3">
                 <div class="col-6 col-md-3">
                     <label class="form-label fw-semibold small">Tanggal Awal</label>
-                    <input type="date" name="tanggal_awal" class="form-control" value="{{ request('tanggal_awal') }}">
+                    <input type="date"
+                           name="tanggal_awal"
+                           class="form-control"
+                           value="{{ request('tanggal_awal') }}">
                 </div>
 
                 <div class="col-6 col-md-3">
                     <label class="form-label fw-semibold small">Tanggal Akhir</label>
-                    <input type="date" name="tanggal_akhir" class="form-control" value="{{ request('tanggal_akhir') }}">
+                    <input type="date"
+                           name="tanggal_akhir"
+                           class="form-control"
+                           value="{{ request('tanggal_akhir') }}">
                 </div>
 
                 <div class="col-12 col-md-3">
                     <label class="form-label fw-semibold small">Status</label>
                     <select name="status" class="form-select">
                         <option value="">Semua</option>
-                        <option value="sudah" {{ request('status') === 'sudah' ? 'selected' : '' }}>Sudah Mengambil</option>
-                        <option value="belum" {{ request('status') === 'belum' ? 'selected' : '' }}>Belum Mengambil</option>
+                        <option value="sudah" {{ request('status') === 'sudah' ? 'selected' : '' }}>
+                            Sudah Mengambil
+                        </option>
+                        <option value="belum" {{ request('status') === 'belum' ? 'selected' : '' }}>
+                            Belum Mengambil
+                        </option>
                     </select>
                 </div>
 
@@ -109,7 +129,7 @@
 </div>
 
 {{-- =========================================================
-    TABEL LAPORAN (tampil di layar md ke atas)
+    TABEL LAPORAN (Desktop)
 ========================================================= --}}
 <div class="card shadow-sm border-0 d-none d-md-block">
     <div class="card-body">
@@ -118,12 +138,13 @@
                 <thead class="table-success">
                     <tr>
                         <th width="5%">No</th>
-                        <th width="15%">NIK</th>
+                        <th width="12%">NIK</th>
                         <th>Nama</th>
-                        <th width="15%">Kategori</th>
-                        <th width="15%">Bagian</th>
-                        <th width="15%">Tanggal Ambil</th>
-                        <th width="15%">Status</th>
+                        <th width="12%">Kategori</th>
+                        <th width="13%">Bagian</th>
+                        <th width="13%">Tanggal Ambil</th>
+                        <th width="10%">Jumlah Gula</th>
+                        <th width="13%">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,9 +153,20 @@
                             <td>{{ $key + 1 }}</td>
                             <td><strong>{{ $item->nik }}</strong></td>
                             <td>{{ $item->nama }}</td>
-                            <td>{{ $item->kategori }}</td>
-                            <td>{{ $item->bagian }}</td>
-                            <td>{{ $item->tanggal_ambil ?? '-' }}</td>
+                            <td>{{ $item->kategori ?? '-' }}</td>
+                            <td>{{ $item->bagian ?? '-' }}</td>
+                            <td>
+                                {{ $item->tanggal_ambil
+                                    ? \Carbon\Carbon::parse($item->tanggal_ambil)->format('d-m-Y')
+                                    : '-' }}
+                            </td>
+                            <td>
+                                @if(!is_null($item->jumlah_gula))
+                                    <strong>{{ $item->jumlah_gula }} KG</strong>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>
                                 @if($item->tanggal_ambil)
                                     <span class="badge bg-success">
@@ -151,7 +183,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-5">
+                            <td colspan="8" class="text-center text-muted py-5">
                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                 <span class="fs-5">Belum ada data laporan</span>
                             </td>
@@ -164,12 +196,11 @@
 </div>
 
 {{-- =========================================================
-    DAFTAR LAPORAN - CARD LIST (tampil di layar kecil / HP)
+    CARD LIST (Mobile)
 ========================================================= --}}
 <div class="d-block d-md-none">
 
     @forelse($laporan ?? [] as $key => $item)
-
         <div class="card shadow-sm border-0 mb-3">
             <div class="card-body">
 
@@ -181,20 +212,31 @@
                     <span class="text-muted small">#{{ $key + 1 }}</span>
                 </div>
 
-                <div class="row gy-1 small mb-3">
+                <div class="row gy-2 small mb-3">
                     <div class="col-6">
                         <span class="text-muted d-block">Kategori</span>
-                        <span>{{ $item->kategori }}</span>
+                        <span>{{ $item->kategori ?? '-' }}</span>
                     </div>
 
                     <div class="col-6">
                         <span class="text-muted d-block">Bagian</span>
-                        <span>{{ $item->bagian }}</span>
+                        <span>{{ $item->bagian ?? '-' }}</span>
                     </div>
 
                     <div class="col-6">
                         <span class="text-muted d-block">Tanggal Ambil</span>
-                        <span>{{ $item->tanggal_ambil ?? '-' }}</span>
+                        <span>
+                            {{ $item->tanggal_ambil
+                                ? \Carbon\Carbon::parse($item->tanggal_ambil)->format('d-m-Y')
+                                : '-' }}
+                        </span>
+                    </div>
+
+                    <div class="col-6">
+                        <span class="text-muted d-block">Jumlah Gula</span>
+                        <span class="fw-semibold">
+                            {{ !is_null($item->jumlah_gula) ? $item->jumlah_gula . ' KG' : '-' }}
+                        </span>
                     </div>
                 </div>
 
@@ -212,16 +254,13 @@
 
             </div>
         </div>
-
     @empty
-
         <div class="card shadow-sm border-0">
             <div class="card-body text-center text-muted py-5">
                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                 <span class="fs-5">Belum ada data laporan</span>
             </div>
         </div>
-
     @endforelse
 
 </div>
