@@ -2,6 +2,26 @@
     SIDEBAR PG GENDING
 ========================================================= --}}
 
+@php
+    // Deteksi guard mana yang sedang login, lalu siapkan
+    // satu set data yang dipakai bareng untuk kartu user + logout.
+    // Ini menggantikan 2 blok HTML identik yang sebelumnya
+    // diduplikasi untuk guard 'web' dan guard 'karyawan'.
+    $isKaryawan = auth('karyawan')->check();
+
+    if ($isKaryawan) {
+        $sidebarUserName = auth('karyawan')->user()->nama ?? 'Karyawan';
+        $sidebarUserRole = 'Karyawan';
+        $sidebarLogoutRoute = route('karyawan.logout');
+    } else {
+        $sidebarUserName = auth()->user()->nama_lengkap
+            ?? auth()->user()->username
+            ?? '';
+        $sidebarUserRole = auth()->user()->role ?? '';
+        $sidebarLogoutRoute = route('logout');
+    }
+@endphp
+
 <div class="d-flex flex-column h-100">
 
 
@@ -15,23 +35,8 @@
 
             {{-- Logo --}}
 
-            <div
-                style="
-                    width: 45px;
-                    height: 45px;
-                    min-width: 45px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 13px;
-                    background: rgba(255,255,255,0.15);
-                    color: white;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-                "
-            >
-
+            <div class="sidebar-logo-icon">
                 <i class="bi bi-buildings-fill fs-4"></i>
-
             </div>
 
 
@@ -73,13 +78,7 @@
         GARIS PEMBATAS
     ====================================================== --}}
 
-    <div
-        style="
-            height: 1px;
-            background: rgba(255,255,255,0.12);
-            margin: 0 1rem;
-        "
-    ></div>
+    <div class="sidebar-divider"></div>
 
 
 
@@ -87,7 +86,7 @@
         MENU
     ====================================================== --}}
 
-    <div class="flex-grow-1">
+    <nav class="flex-grow-1" aria-label="Menu utama">
 
 
         {{-- =================================================
@@ -128,13 +127,15 @@
                         DATA KARYAWAN
                     ========================================== --}}
 
+                    @php
+                        $isKaryawanMenuActive = request()->routeIs('admin.karyawan')
+                            || request()->routeIs('admin.karyawan.show');
+                    @endphp
+
                     <a
                         href="{{ route('admin.karyawan') }}"
-                        class="nav-link mb-1
-                        {{ request()->routeIs('admin.karyawan')
-                            || request()->routeIs('admin.karyawan.show')
-                            ? 'active'
-                            : '' }}"
+                        class="nav-link mb-1 {{ $isKaryawanMenuActive ? 'active' : '' }}"
+                        @if($isKaryawanMenuActive) aria-current="page" @endif
                     >
 
                         <i class="bi bi-people-fill"></i>
@@ -151,12 +152,14 @@
                         LAPORAN
                     ========================================== --}}
 
+                    @php
+                        $isLaporanActive = request()->routeIs('admin.laporan.*');
+                    @endphp
+
                     <a
                         href="{{ route('admin.laporan.index') }}"
-                        class="nav-link mb-1
-                        {{ request()->routeIs('admin.laporan.*')
-                            ? 'active'
-                            : '' }}"
+                        class="nav-link mb-1 {{ $isLaporanActive ? 'active' : '' }}"
+                        @if($isLaporanActive) aria-current="page" @endif
                     >
 
                         <i class="bi bi-file-earmark-bar-graph"></i>
@@ -173,12 +176,14 @@
                         KELOLA OPERATOR
                     ========================================== --}}
 
+                    @php
+                        $isOperatorMenuActive = request()->routeIs('admin.operator.*');
+                    @endphp
+
                     <a
                         href="{{ route('admin.operator.index') }}"
-                        class="nav-link mb-1
-                        {{ request()->routeIs('admin.operator.*')
-                            ? 'active'
-                            : '' }}"
+                        class="nav-link mb-1 {{ $isOperatorMenuActive ? 'active' : '' }}"
+                        @if($isOperatorMenuActive) aria-current="page" @endif
                     >
 
                         <i class="bi bi-person-gear"></i>
@@ -227,12 +232,14 @@
                         DASHBOARD
                     ========================================== --}}
 
+                    @php
+                        $isOperatorDashboardActive = request()->routeIs('operator.dashboard');
+                    @endphp
+
                     <a
                         href="{{ route('operator.dashboard') }}"
-                        class="nav-link mb-1
-                        {{ request()->routeIs('operator.dashboard')
-                            ? 'active'
-                            : '' }}"
+                        class="nav-link mb-1 {{ $isOperatorDashboardActive ? 'active' : '' }}"
+                        @if($isOperatorDashboardActive) aria-current="page" @endif
                     >
 
                         <i class="bi bi-speedometer2"></i>
@@ -284,12 +291,14 @@
                     DASHBOARD KARYAWAN
                 ============================================== --}}
 
+                @php
+                    $isKaryawanDashboardActive = request()->routeIs('karyawan.dashboard');
+                @endphp
+
                 <a
                     href="{{ route('karyawan.dashboard') }}"
-                    class="nav-link mb-1
-                    {{ request()->routeIs('karyawan.dashboard')
-                        ? 'active'
-                        : '' }}"
+                    class="nav-link mb-1 {{ $isKaryawanDashboardActive ? 'active' : '' }}"
+                    @if($isKaryawanDashboardActive) aria-current="page" @endif
                 >
 
                     <i class="bi bi-house-door-fill"></i>
@@ -306,115 +315,63 @@
         @endauth
 
 
-    </div>
+    </nav>
 
 
 
     {{-- =====================================================
         USER INFO + LOGOUT
+        (satu blok untuk semua guard, lihat @php di atas)
     ====================================================== --}}
 
-    <div class="px-3 pb-4">
+    @if($isKaryawan || auth('web')->check())
+
+        <div class="px-3 pb-4">
 
 
-        {{-- Garis --}}
+            {{-- Garis --}}
 
-        <div
-            style="
-                height: 1px;
-                background: rgba(255,255,255,0.12);
-                margin-bottom: 1rem;
-            "
-        ></div>
+            <div class="sidebar-divider--footer"></div>
 
 
+            {{-- Kartu User --}}
 
-        {{-- =================================================
-            ADMIN / OPERATOR USER
-        ================================================== --}}
-
-        @auth('web')
-
-            <div
-                class="d-flex align-items-center mb-3"
-                style="
-                    padding: 0.7rem;
-                    border-radius: 12px;
-                    background: rgba(255,255,255,0.08);
-                "
-            >
-
+            <div class="sidebar-user-card">
 
                 {{-- Avatar --}}
 
-                <div
-                    style="
-                        width: 38px;
-                        height: 38px;
-                        min-width: 38px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        background: rgba(255,255,255,0.18);
-                        color: white;
-                    "
-                >
-
+                <div class="sidebar-avatar">
                     <i class="bi bi-person-fill"></i>
-
                 </div>
 
 
-
-                {{-- User --}}
+                {{-- Nama + Role --}}
 
                 <div class="ms-2 overflow-hidden">
 
-                    <div
-                        class="text-white fw-semibold text-truncate"
-                        style="font-size: 0.82rem;"
-                    >
-
-                        {{ auth()->user()->nama_lengkap ?? auth()->user()->username }}
-
+                    <div class="sidebar-user-name text-truncate">
+                        {{ $sidebarUserName }}
                     </div>
 
-
-                    <div
-                        style="
-                            color: rgba(255,255,255,0.60);
-                            font-size: 0.68rem;
-                            text-transform: capitalize;
-                        "
-                    >
-
-                        {{ auth()->user()->role }}
-
+                    <div class="sidebar-user-role">
+                        {{ $sidebarUserRole }}
                     </div>
 
                 </div>
 
             </div>
-
 
 
             {{-- Logout --}}
 
-            <form
-                method="POST"
-                action="{{ route('logout') }}"
-            >
+            <form method="POST" action="{{ $sidebarLogoutRoute }}">
 
                 @csrf
 
                 <button
                     type="submit"
-                    class="nav-link w-100 border-0 text-start"
-                    style="
-                        background: transparent;
-                        color: rgba(255,255,255,0.78);
-                    "
+                    class="nav-link sidebar-logout-btn w-100 text-start"
+                    aria-label="Keluar dari akun {{ $sidebarUserName }}"
                 >
 
                     <i class="bi bi-box-arrow-right"></i>
@@ -427,111 +384,9 @@
 
             </form>
 
-        @endauth
+        </div>
 
-
-
-        {{-- =================================================
-            KARYAWAN
-        ================================================== --}}
-
-        @auth('karyawan')
-
-            <div
-                class="d-flex align-items-center mb-3"
-                style="
-                    padding: 0.7rem;
-                    border-radius: 12px;
-                    background: rgba(255,255,255,0.08);
-                "
-            >
-
-
-                {{-- Avatar --}}
-
-                <div
-                    style="
-                        width: 38px;
-                        height: 38px;
-                        min-width: 38px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        background: rgba(255,255,255,0.18);
-                        color: white;
-                    "
-                >
-
-                    <i class="bi bi-person-fill"></i>
-
-                </div>
-
-
-
-                {{-- User --}}
-
-                <div class="ms-2 overflow-hidden">
-
-                    <div
-                        class="text-white fw-semibold text-truncate"
-                        style="font-size: 0.82rem;"
-                    >
-
-                        {{ auth('karyawan')->user()->nama ?? 'Karyawan' }}
-
-                    </div>
-
-
-                    <div
-                        style="
-                            color: rgba(255,255,255,0.60);
-                            font-size: 0.68rem;
-                        "
-                    >
-
-                        Karyawan
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            {{-- Logout Karyawan --}}
-
-            <form
-                method="POST"
-                action="{{ route('karyawan.logout') }}"
-            >
-
-                @csrf
-
-                <button
-                    type="submit"
-                    class="nav-link w-100 border-0 text-start"
-                    style="
-                        background: transparent;
-                        color: rgba(255,255,255,0.78);
-                    "
-                >
-
-                    <i class="bi bi-box-arrow-right"></i>
-
-                    <span>
-                        Logout
-                    </span>
-
-                </button>
-
-            </form>
-
-        @endauth
-
-
-    </div>
+    @endif
 
 
 </div>

@@ -262,6 +262,73 @@
             letter-spacing: 0.8px;
         }
 
+        /* ==========================================================
+           SIDEBAR - elemen yang dulunya inline style (PERBAIKAN BARU)
+        ========================================================== */
+        .sidebar-logo-icon {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.12);
+            margin: 0 1rem;
+        }
+
+        .sidebar-divider--footer {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.12);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-user-card {
+            display: flex;
+            align-items: center;
+            padding: 0.7rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-avatar {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+        .sidebar-user-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.82rem;
+        }
+
+        .sidebar-user-role {
+            color: rgba(255, 255, 255, 0.60);
+            font-size: 0.68rem;
+            text-transform: capitalize;
+        }
+
+        .sidebar-logout-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.78);
+            border: 0;
+        }
+
         /* Main content */
         .app-main {
             min-height: calc(100vh - var(--pg-navbar-height));
@@ -362,23 +429,28 @@
         /* Table */
         .table {
             margin-bottom: 0;
+            table-layout: fixed;   /* lebar kolom konsisten, tidak ikut isi data */
         }
 
         .table thead th {
-            background: #f7f9f8;
-            color: #59656f;
-            border-bottom: 1px solid var(--pg-border);
+            background: var(--pg-green-soft);  /* kontras lebih jelas dari body tabel */
+            color: var(--pg-green-dark);
+            border-bottom: 2px solid var(--pg-green);
             font-size: 0.76rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.3px;
             white-space: nowrap;
+            padding: 0.85rem 1rem;
         }
 
         .table tbody td {
             vertical-align: middle;
             border-color: #edf1ef;
             color: #39444d;
+            padding: 0.75rem 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .table tbody tr {
@@ -389,11 +461,42 @@
             background-color: #f8fbf9;
         }
 
-        /* Penting untuk tabel di HP */
+        /* Penting untuk tabel di HP: bungkus scroll horizontal */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+        }
+
+        /* Badge status - hijau untuk aktif, merah untuk nonaktif */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-badge.status-aktif {
+            background: #e3f7ea;
+            color: #198754;
+        }
+
+        .status-badge.status-nonaktif {
+            background: #fdeaea;
+            color: #dc3545;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
         }
 
         /* Badge */
@@ -440,24 +543,61 @@
             color: var(--pg-green);
         }
 
+        /* ==========================================================
+           SIDEBAR MOBILE - POLA GESER/PUSH (PERBAIKAN BARU)
+           Sidebar slide-in dari kiri, konten (navbar+main+footer)
+           ikut geser ke kanan mengikuti lebar sidebar - bukan ditutupi.
+        ========================================================== */
+        body.sidebar-open {
+            overflow: hidden; /* cegah body ikut ter-scroll saat menu terbuka */
+        }
+
         /* Mobile / Tablet */
         @media (max-width: 991.98px) {
             :root {
                 --pg-navbar-height: 65px;
+                --pg-sidebar-width-mobile: min(85vw, 300px);
             }
 
-            /* Sidebar berubah menjadi drawer */
+            /* Sidebar berubah menjadi drawer, tersembunyi di luar layar (kiri) */
             .app-sidebar {
                 top: var(--pg-navbar-height);
-                width: min(85vw, 300px);
+                width: var(--pg-sidebar-width-mobile);
                 max-height: none;
                 overflow-y: auto;
                 border-right: 1px solid rgba(255, 255, 255, 0.12);
                 border-bottom: 0;
                 box-shadow: 8px 0 30px rgba(16, 71, 45, 0.20);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
 
-            /* Content memenuhi layar */
+            /* Netralkan animasi bawaan Bootstrap collapse - visibilitas
+               sepenuhnya dikendalikan oleh transform di atas */
+            .app-sidebar .collapse:not(.show),
+            .app-sidebar .collapsing {
+                display: block !important;
+                height: auto !important;
+            }
+
+            /* Saat menu terbuka: sidebar masuk, konten ikut geser ke kanan */
+            body.sidebar-open .app-sidebar {
+                transform: translateX(0);
+            }
+
+            .app-navbar,
+            .app-main,
+            .app-footer {
+                transition: transform 0.3s ease;
+            }
+
+            body.sidebar-open .app-navbar,
+            body.sidebar-open .app-main,
+            body.sidebar-open .app-footer {
+                transform: translateX(var(--pg-sidebar-width-mobile));
+            }
+
+            /* Content memenuhi layar saat menu tertutup */
             .app-main {
                 margin-left: 0;
                 padding: 1.25rem;
@@ -752,6 +892,55 @@
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ></script>
+
+    {{-- Script Sidebar Mobile - Pola Geser/Push (PERBAIKAN BARU) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarCollapseEl = document.getElementById('mobileSidebar');
+            const sidebarToggleBtn = document.querySelector('[data-bs-target="#mobileSidebar"]');
+            const sidebarEl = document.querySelector('.app-sidebar');
+
+            if (!sidebarCollapseEl) {
+                return;
+            }
+
+            // Saat sidebar mulai terbuka -> tandai body, konten ikut geser (lihat CSS)
+            sidebarCollapseEl.addEventListener('show.bs.collapse', function () {
+                document.body.classList.add('sidebar-open');
+            });
+
+            // Saat sidebar mulai tertutup -> konten kembali ke posisi semula
+            sidebarCollapseEl.addEventListener('hide.bs.collapse', function () {
+                document.body.classList.remove('sidebar-open');
+            });
+
+            // Tap di luar sidebar (area konten yang tergeser) -> tutup sidebar
+            document.addEventListener('click', function (e) {
+                const isOpen = document.body.classList.contains('sidebar-open');
+                if (!isOpen || window.innerWidth >= 992) {
+                    return;
+                }
+
+                const clickedInsideSidebar = sidebarEl && sidebarEl.contains(e.target);
+                const clickedToggleBtn = sidebarToggleBtn && sidebarToggleBtn.contains(e.target);
+
+                if (!clickedInsideSidebar && !clickedToggleBtn) {
+                    const instance = bootstrap.Collapse.getInstance(sidebarCollapseEl);
+                    if (instance) instance.hide();
+                }
+            });
+
+            // Tap salah satu menu di HP -> otomatis tutup sidebar
+            sidebarCollapseEl.querySelectorAll('.nav-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) {
+                        const instance = bootstrap.Collapse.getInstance(sidebarCollapseEl);
+                        if (instance) instance.hide();
+                    }
+                });
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>
