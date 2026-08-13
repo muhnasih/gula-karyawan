@@ -7,6 +7,10 @@
 <style>
     /* =========================================================
        DASHBOARD OPERATOR
+       Fokus:
+       - Scanner
+       - Hasil Scan
+       - Riwayat Pengambilan
        Responsive Desktop + Tablet + HP
     ========================================================= */
 
@@ -16,7 +20,11 @@
         overflow-x: hidden;
     }
 
-    /* HEADER */
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
     .operator-header {
         margin-bottom: 1.25rem;
     }
@@ -32,53 +40,6 @@
         color: #6c757d;
     }
 
-    /* =========================================================
-       STATISTIK
-    ========================================================= */
-
-    .stat-card {
-        border: 0;
-        border-radius: 16px;
-        overflow: hidden;
-        height: 100%;
-        transition: all .2s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .stat-card .card-body {
-        padding: 1.25rem;
-    }
-
-    .stat-icon {
-        width: 58px;
-        height: 58px;
-        min-width: 58px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .stat-icon i {
-        font-size: 1.5rem;
-    }
-
-    .stat-label {
-        font-size: .75rem;
-        font-weight: 600;
-        letter-spacing: .3px;
-        color: #6c757d;
-        margin-bottom: .15rem;
-    }
-
-    .stat-number {
-        font-size: 1.8rem;
-        line-height: 1.1;
-        font-weight: 700;
-    }
 
     /* =========================================================
        CARD
@@ -102,6 +63,7 @@
         align-items: center;
         gap: .5rem;
     }
+
 
     /* =========================================================
        SCANNER
@@ -133,10 +95,12 @@
         max-width: 100%;
     }
 
+
     /*
-     * html5-qrcode membuat beberapa elemen internal.
-     * Override supaya tidak melebar keluar layar HP.
+     * Override html5-qrcode
+     * supaya tidak melebar keluar layar HP.
      */
+
     #reader__scan_region {
         width: 100% !important;
         min-height: 0 !important;
@@ -169,12 +133,17 @@
         margin-top: 6px;
     }
 
-    /* Status scanner */
+
+    /* =========================================================
+       STATUS SCANNER
+    ========================================================= */
+
     #scan-status {
         border-radius: 10px;
         font-size: .9rem;
         line-height: 1.4;
     }
+
 
     /* =========================================================
        HASIL SCAN
@@ -218,13 +187,18 @@
         line-height: 1.5;
     }
 
-    /* Tombol */
+
+    /* =========================================================
+       TOMBOL
+    ========================================================= */
+
     #form-confirm .btn,
     #scan-lagi {
         min-height: 46px;
         border-radius: 10px;
         font-weight: 600;
     }
+
 
     /* =========================================================
        RIWAYAT
@@ -263,6 +237,7 @@
         padding: 1.5rem .5rem !important;
     }
 
+
     /* =========================================================
        MOBILE
     ========================================================= */
@@ -287,30 +262,9 @@
             line-height: 1.4;
         }
 
-        /* Statistik */
-        .stat-card .card-body {
-            padding: 1rem;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            min-width: 50px;
-        }
-
-        .stat-icon i {
-            font-size: 1.3rem;
-        }
-
-        .stat-label {
-            font-size: .68rem;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-        }
 
         /* Card */
+
         .operator-card .card-body {
             padding: 1rem;
         }
@@ -319,7 +273,9 @@
             font-size: .98rem;
         }
 
+
         /* Scanner */
+
         .scanner-wrapper {
             max-width: 100%;
         }
@@ -336,7 +292,9 @@
             font-size: .82rem;
         }
 
-        /* Data karyawan */
+
+        /* Data Karyawan */
+
         .employee-info {
             padding: .85rem;
         }
@@ -358,18 +316,24 @@
             font-size: 1rem !important;
         }
 
+
         /* Tombol */
+
         #form-confirm .btn,
         #scan-lagi {
             min-height: 48px;
             font-size: .9rem;
         }
 
+
         /* Riwayat */
+
         #tabel-riwayat {
             min-width: 330px;
         }
+
     }
+
 
     /* =========================================================
        HP KECIL
@@ -385,24 +349,6 @@
             font-size: .78rem;
         }
 
-        .stat-card .card-body {
-            padding: .85rem;
-        }
-
-        .stat-icon {
-            width: 46px;
-            height: 46px;
-            min-width: 46px;
-        }
-
-        .stat-icon i {
-            font-size: 1.15rem;
-        }
-
-        .stat-number {
-            font-size: 1.35rem;
-        }
-
         .operator-card .card-body {
             padding: .85rem;
         }
@@ -414,7 +360,9 @@
         #scan-status {
             font-size: .78rem;
         }
+
     }
+
 
     /* =========================================================
        TABLET
@@ -422,24 +370,16 @@
 
     @media (min-width: 768px) and (max-width: 991.98px) {
 
-        .stat-card .card-body {
+        .operator-card .card-body {
             padding: 1rem;
-        }
-
-        .stat-icon {
-            width: 52px;
-            height: 52px;
-            min-width: 52px;
-        }
-
-        .stat-number {
-            font-size: 1.55rem;
         }
 
         #reader video {
             max-height: 380px;
         }
+
     }
+
 
     /* =========================================================
        ANIMASI HASIL SCAN
@@ -450,6 +390,7 @@
     }
 
     @keyframes scanResult {
+
         from {
             opacity: 0;
             transform: translateY(8px);
@@ -459,26 +400,39 @@
             opacity: 1;
             transform: translateY(0);
         }
+
     }
+
 </style>
 
 
+
 <div class="operator-dashboard">
+
 
     {{-- =====================================================
         HEADER
     ===================================================== --}}
 
     <div class="operator-header">
+
         <h2>
+
             <i class="bi bi-speedometer2"></i>
+
             Dashboard Operator
+
         </h2>
 
+
         <p>
-            Ringkasan &amp; scan pengambilan gula karyawan PG Gending
+
+            Scan pengambilan gula karyawan PG Gending
+
         </p>
+
     </div>
+
 
 
     {{-- =====================================================
@@ -486,135 +440,55 @@
     ===================================================== --}}
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+
+        <div
+            class="alert alert-success alert-dismissible fade show rounded-3"
+            role="alert"
+        >
+
             <i class="bi bi-check-circle-fill me-1"></i>
+
             {{ session('success') }}
 
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close">
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+            >
             </button>
+
         </div>
+
     @endif
+
 
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+
+        <div
+            class="alert alert-danger alert-dismissible fade show rounded-3"
+            role="alert"
+        >
+
             <i class="bi bi-exclamation-circle-fill me-1"></i>
+
             {{ session('error') }}
 
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close">
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+            >
             </button>
+
         </div>
+
     @endif
 
-
-    {{-- =====================================================
-        STATISTIK
-    ===================================================== --}}
-
-    <div class="row g-3 mb-4">
-
-        {{-- TOTAL KARYAWAN --}}
-        <div class="col-12 col-sm-6 col-lg-4">
-
-            <div class="card shadow-sm stat-card">
-
-                <div class="card-body d-flex align-items-center">
-
-                    <div class="stat-icon bg-primary bg-opacity-10 me-3">
-                        <i class="bi bi-people-fill text-primary"></i>
-                    </div>
-
-                    <div class="flex-grow-1">
-
-                        <div class="stat-label">
-                            TOTAL KARYAWAN
-                        </div>
-
-                        <div class="stat-number">
-                            {{ $totalKaryawan }}
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- SUDAH MENGAMBIL --}}
-        <div class="col-12 col-sm-6 col-lg-4">
-
-            <div class="card shadow-sm stat-card">
-
-                <div class="card-body d-flex align-items-center">
-
-                    <div class="stat-icon bg-success bg-opacity-10 me-3">
-                        <i class="bi bi-check-circle-fill text-success"></i>
-                    </div>
-
-                    <div class="flex-grow-1">
-
-                        <div class="stat-label">
-                            SUDAH MENGAMBIL
-                        </div>
-
-                        <div
-                            class="stat-number text-success"
-                            id="stat-sudah"
-                        >
-                            {{ $sudahAmbil }}
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- BELUM MENGAMBIL --}}
-        <div class="col-12 col-sm-6 col-lg-4">
-
-            <div class="card shadow-sm stat-card">
-
-                <div class="card-body d-flex align-items-center">
-
-                    <div class="stat-icon bg-danger bg-opacity-10 me-3">
-                        <i class="bi bi-exclamation-circle-fill text-danger"></i>
-                    </div>
-
-                    <div class="flex-grow-1">
-
-                        <div class="stat-label">
-                            BELUM MENGAMBIL
-                        </div>
-
-                        <div
-                            class="stat-number text-danger"
-                            id="stat-belum"
-                        >
-                            {{ $belumAmbil }}
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
 
 
     {{-- =====================================================
@@ -623,19 +497,29 @@
 
     <div class="row g-3">
 
+
         {{-- =================================================
             KIRI : SCANNER + HASIL
         ================================================== --}}
+
         <div class="col-12 col-lg-7">
 
-            {{-- SCANNER --}}
+
+            {{-- =================================================
+                SCANNER
+            ================================================= --}}
+
             <div class="card shadow-sm operator-card mb-3">
 
                 <div class="card-body">
 
+
                     <div class="card-title-operator">
+
                         <i class="bi bi-qr-code-scan text-success"></i>
+
                         Kamera Scanner
+
                     </div>
 
 
@@ -650,8 +534,11 @@
                         id="scan-status"
                         class="alert alert-info mt-3 mb-0"
                     >
+
                         <i class="bi bi-camera me-1"></i>
+
                         Arahkan kamera ke QR Code karyawan.
+
                     </div>
 
                 </div>
@@ -659,9 +546,10 @@
             </div>
 
 
+
             {{-- =================================================
                 HASIL SCAN
-            ================================================== --}}
+            ================================================= --}}
 
             <div
                 id="hasil-scan"
@@ -670,18 +558,28 @@
 
                 <div class="card-body">
 
+
                     <div class="card-title-operator">
+
                         <i class="bi bi-person-vcard text-success"></i>
+
                         Data Karyawan
+
                     </div>
 
 
-                    {{-- DATA KARYAWAN --}}
+
+                    {{-- =================================================
+                        DATA KARYAWAN
+                    ================================================= --}}
+
                     <div class="employee-info">
 
                         <div class="row g-3">
 
+
                             {{-- NAMA --}}
+
                             <div class="col-12 col-sm-6">
 
                                 <div class="employee-item">
@@ -702,7 +600,9 @@
                             </div>
 
 
+
                             {{-- NIK --}}
+
                             <div class="col-12 col-sm-6">
 
                                 <div class="employee-item">
@@ -723,7 +623,9 @@
                             </div>
 
 
+
                             {{-- JABATAN --}}
+
                             <div class="col-12 col-sm-6">
 
                                 <div class="employee-item">
@@ -744,7 +646,9 @@
                             </div>
 
 
+
                             {{-- BAGIAN --}}
+
                             <div class="col-12 col-sm-6">
 
                                 <div class="employee-item">
@@ -764,16 +668,23 @@
 
                             </div>
 
+
                         </div>
 
                     </div>
 
 
-                    {{-- STATUS --}}
+
+                    {{-- =================================================
+                        STATUS
+                    ================================================== --}}
+
                     <div
                         id="status-box"
                         class="alert mt-3"
-                    ></div>
+                    >
+                    </div>
+
 
 
                     {{-- =================================================
@@ -789,11 +700,13 @@
 
                         @csrf
 
+
                         <input
                             type="hidden"
                             name="nik"
                             id="nik-input"
                         >
+
 
                         <input
                             type="hidden"
@@ -806,22 +719,32 @@
                             type="submit"
                             class="btn btn-success w-100"
                         >
+
                             <i class="bi bi-check-circle-fill me-1"></i>
+
                             Konfirmasi Pengambilan
+
                         </button>
 
                     </form>
 
 
-                    {{-- SCAN LAGI --}}
+
+                    {{-- =================================================
+                        SCAN LAGI
+                    ================================================== --}}
+
                     <button
                         type="button"
                         id="scan-lagi"
                         class="btn btn-primary w-100 mt-2"
                         onclick="scanLagi()"
                     >
+
                         <i class="bi bi-camera me-1"></i>
+
                         Scan Karyawan Lain
+
                     </button>
 
                 </div>
@@ -831,19 +754,26 @@
         </div>
 
 
+
         {{-- =================================================
             KANAN : RIWAYAT
         ================================================== --}}
+
         <div class="col-12 col-lg-5">
 
             <div class="card shadow-sm operator-card">
 
                 <div class="card-body">
 
+
                     <div class="card-title-operator">
+
                         <i class="bi bi-clock-history text-success"></i>
+
                         Riwayat Pengambilan
+
                     </div>
+
 
 
                     <div class="history-wrapper">
@@ -856,15 +786,26 @@
                             <thead>
 
                                 <tr>
-                                    <th>NIK</th>
-                                    <th>Nama</th>
-                                    <th>Status</th>
+
+                                    <th>
+                                        NIK
+                                    </th>
+
+                                    <th>
+                                        Nama
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
                                 </tr>
 
                             </thead>
 
 
                             <tbody>
+
 
                                 @forelse($riwayat ?? [] as $item)
 
@@ -879,9 +820,11 @@
                                         </td>
 
                                         <td>
+
                                             <span class="badge bg-success">
                                                 SUDAH
                                             </span>
+
                                         </td>
 
                                     </tr>
@@ -894,13 +837,17 @@
                                             colspan="3"
                                             class="text-center text-muted history-empty"
                                         >
+
                                             <i class="bi bi-inbox fs-4 d-block mb-1"></i>
+
                                             Belum ada data
+
                                         </td>
 
                                     </tr>
 
                                 @endforelse
+
 
                             </tbody>
 
@@ -914,9 +861,11 @@
 
         </div>
 
+
     </div>
 
 </div>
+
 
 
 {{-- =========================================================
@@ -926,86 +875,138 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 
+
 <script>
 
     let scanner = null;
+
     let sedangScan = true;
+
 
 
     /*
     |--------------------------------------------------------------------------
-    | Mulai Scanner
+    | MULAI SCANNER
     |--------------------------------------------------------------------------
     */
 
     function mulaiScanner()
     {
-        const reader = document.getElementById('reader');
+
+        const reader =
+            document.getElementById('reader');
+
 
         if (!reader) {
             return;
         }
 
-        scanner = new Html5Qrcode("reader");
+
+        scanner =
+            new Html5Qrcode("reader");
+
 
         scanner.start(
+
             {
                 facingMode: "environment"
             },
+
             {
+
                 fps: 10,
 
-                qrbox: function(viewfinderWidth, viewfinderHeight) {
+
+                qrbox: function(
+                    viewfinderWidth,
+                    viewfinderHeight
+                ) {
+
 
                     /*
                      * Ukuran QR box responsif.
-                     * HP kecil -> lebih kecil
-                     * HP besar/desktop -> lebih besar
                      */
 
-                    let ukuran = Math.floor(
-                        Math.min(viewfinderWidth, viewfinderHeight) * 0.65
-                    );
+                    let ukuran =
+                        Math.floor(
+                            Math.min(
+                                viewfinderWidth,
+                                viewfinderHeight
+                            ) * 0.65
+                        );
 
-                    ukuran = Math.max(180, ukuran);
-                    ukuran = Math.min(300, ukuran);
+
+                    ukuran =
+                        Math.max(
+                            180,
+                            ukuran
+                        );
+
+
+                    ukuran =
+                        Math.min(
+                            300,
+                            ukuran
+                        );
+
 
                     return {
+
                         width: ukuran,
+
                         height: ukuran
+
                     };
+
                 },
+
 
                 aspectRatio: 1.0,
 
                 disableFlip: false
+
             },
 
-            function(decodedText) {
+
+            function(decodedText)
+            {
 
                 if (!sedangScan) {
                     return;
                 }
 
+
                 sedangScan = false;
+
 
                 prosesScan(decodedText);
 
             },
 
-            function(errorMessage) {
 
-                // Error scan tidak perlu ditampilkan.
+            function(errorMessage)
+            {
+                /*
+                 * Error scanner tidak perlu ditampilkan.
+                 */
             }
 
-        ).catch(function(error) {
+        )
+        .catch(function(error)
+        {
 
             console.error(error);
 
-            const status = document.getElementById('scan-status');
+
+            const status =
+                document.getElementById(
+                    'scan-status'
+                );
+
 
             status.className =
                 'alert alert-danger mt-3 mb-0';
+
 
             status.innerHTML =
                 '<i class="bi bi-camera-video-off-fill me-1"></i>' +
@@ -1013,63 +1014,85 @@
                 'Pastikan izin kamera diberikan pada browser.';
 
         });
+
     }
+
 
 
     /*
     |--------------------------------------------------------------------------
-    | Proses hasil QR
+    | PROSES HASIL QR
     |--------------------------------------------------------------------------
     */
 
     function prosesScan(nik)
     {
 
-        const status = document.getElementById('scan-status');
+        const status =
+            document.getElementById(
+                'scan-status'
+            );
+
 
         status.className =
             'alert alert-warning mt-3 mb-0';
+
 
         status.innerHTML =
             '<span class="spinner-border spinner-border-sm me-1"></span>' +
             'QR terbaca. Mencari data karyawan...';
 
 
-        fetch('{{ route('operator.scan.store') }}', {
 
-            method: 'POST',
+        fetch(
+            '{{ route('operator.scan.store') }}',
+            {
 
-            headers: {
+                method: 'POST',
 
-                'Content-Type': 'application/json',
 
-                'X-CSRF-TOKEN':
-                    '{{ csrf_token() }}',
+                headers:
+                {
 
-                'Accept':
-                    'application/json'
+                    'Content-Type':
+                        'application/json',
 
-            },
+                    'X-CSRF-TOKEN':
+                        '{{ csrf_token() }}',
 
-            body: JSON.stringify({
-                nik: nik
-            })
+                    'Accept':
+                        'application/json'
 
-        })
+                },
 
-        .then(response => {
+
+                body:
+                    JSON.stringify({
+                        nik: nik
+                    })
+
+            }
+
+        )
+
+        .then(response =>
+        {
 
             if (!response.ok) {
+
                 throw new Error(
                     'Terjadi kesalahan pada server.'
                 );
+
             }
+
 
             return response.json();
 
         })
 
-        .then(data => {
+        .then(data =>
+        {
 
             if (!data.success) {
 
@@ -1080,20 +1103,25 @@
 
             }
 
+
             tampilkanData(data);
 
         })
 
-        .catch(error => {
+        .catch(error =>
+        {
 
             console.error(error);
+
 
             status.className =
                 'alert alert-danger mt-3 mb-0';
 
+
             status.innerHTML =
                 '<i class="bi bi-exclamation-circle-fill me-1"></i>' +
                 error.message;
+
 
             sedangScan = true;
 
@@ -1102,59 +1130,93 @@
     }
 
 
+
     /*
     |--------------------------------------------------------------------------
-    | Tampilkan data karyawan
+    | TAMPILKAN DATA KARYAWAN
     |--------------------------------------------------------------------------
     */
 
     function tampilkanData(data)
     {
 
-        const karyawan = data.karyawan;
+        const karyawan =
+            data.karyawan;
+
 
         const hasilScan =
-            document.getElementById('hasil-scan');
+            document.getElementById(
+                'hasil-scan'
+            );
 
-        hasilScan.classList.remove('d-none');
 
-        hasilScan.classList.remove('scan-result-animation');
+        hasilScan.classList.remove(
+            'd-none'
+        );
+
+
+        hasilScan.classList.remove(
+            'scan-result-animation'
+        );
+
 
         /*
-         * Memicu ulang animasi.
+         * Trigger animasi ulang.
          */
 
         void hasilScan.offsetWidth;
 
-        hasilScan.classList.add('scan-result-animation');
+
+        hasilScan.classList.add(
+            'scan-result-animation'
+        );
+
 
 
         /*
          * Data karyawan
          */
 
-        document.getElementById('nama').innerText =
+        document.getElementById(
+            'nama'
+        ).innerText =
             karyawan.nama || '-';
 
-        document.getElementById('nik').innerText =
+
+        document.getElementById(
+            'nik'
+        ).innerText =
             karyawan.nik || '-';
 
-        document.getElementById('jabatan').innerText =
+
+        document.getElementById(
+            'jabatan'
+        ).innerText =
             karyawan.jabatan || '-';
 
-        document.getElementById('bagian').innerText =
+
+        document.getElementById(
+            'bagian'
+        ).innerText =
             karyawan.bagian || '-';
+
 
 
         /*
          * Input form
          */
 
-        document.getElementById('nik-input').value =
+        document.getElementById(
+            'nik-input'
+        ).value =
             karyawan.nik || '';
 
-        document.getElementById('periode-input').value =
+
+        document.getElementById(
+            'periode-input'
+        ).value =
             data.periode || '';
+
 
 
         /*
@@ -1162,16 +1224,24 @@
          */
 
         const statusBox =
-            document.getElementById('status-box');
+            document.getElementById(
+                'status-box'
+            );
+
 
         const formConfirm =
-            document.getElementById('form-confirm');
+            document.getElementById(
+                'form-confirm'
+            );
 
 
-        if (data.status === 'belum') {
+
+        if (data.status === 'belum')
+        {
 
             statusBox.className =
                 'alert alert-warning';
+
 
             statusBox.innerHTML =
                 '<i class="bi bi-exclamation-circle-fill me-1"></i>' +
@@ -1181,12 +1251,17 @@
                 (data.periode || '-');
 
 
-            formConfirm.classList.remove('d-none');
+            formConfirm.classList.remove(
+                'd-none'
+            );
 
-        } else {
+        }
+        else
+        {
 
             statusBox.className =
                 'alert alert-success';
+
 
             statusBox.innerHTML =
                 '<i class="bi bi-check-circle-fill me-1"></i>' +
@@ -1199,9 +1274,12 @@
                 (data.tanggal_ambil || '-');
 
 
-            formConfirm.classList.add('d-none');
+            formConfirm.classList.add(
+                'd-none'
+            );
 
         }
+
 
 
         /*
@@ -1209,10 +1287,14 @@
          */
 
         const scanStatus =
-            document.getElementById('scan-status');
+            document.getElementById(
+                'scan-status'
+            );
+
 
         scanStatus.className =
             'alert alert-success mt-3 mb-0';
+
 
         scanStatus.innerHTML =
             '<i class="bi bi-check-circle-fill me-1"></i>' +
@@ -1221,17 +1303,23 @@
     }
 
 
+
     /*
     |--------------------------------------------------------------------------
-    | Tambah riwayat + update statistik
+    | TAMBAH RIWAYAT
     |--------------------------------------------------------------------------
     */
 
-    function tambahRiwayat(nik, nama)
+    function tambahRiwayat(
+        nik,
+        nama
+    )
     {
 
         const kosong =
-            document.getElementById('riwayat-kosong');
+            document.getElementById(
+                'riwayat-kosong'
+            );
 
 
         if (kosong) {
@@ -1246,7 +1334,9 @@
 
 
         const row =
-            document.createElement('tr');
+            document.createElement(
+                'tr'
+            );
 
 
         row.innerHTML =
@@ -1268,193 +1358,235 @@
 
         tbody.prepend(row);
 
-
-        /*
-         * Update statistik
-         */
-
-        const statSudah =
-            document.getElementById('stat-sudah');
-
-        const statBelum =
-            document.getElementById('stat-belum');
-
-
-        statSudah.innerText =
-            parseInt(statSudah.innerText || 0) + 1;
-
-
-        statBelum.innerText =
-            Math.max(
-                0,
-                parseInt(statBelum.innerText || 0) - 1
-            );
-
     }
+
 
 
     /*
     |--------------------------------------------------------------------------
-    | Escape HTML
+    | ESCAPE HTML
     |--------------------------------------------------------------------------
     */
 
     function escapeHtml(value)
     {
 
-        if (value === null || value === undefined) {
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
             return '';
+
         }
 
+
         return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+
+            .replace(
+                /&/g,
+                '&amp;'
+            )
+
+            .replace(
+                /</g,
+                '&lt;'
+            )
+
+            .replace(
+                />/g,
+                '&gt;'
+            )
+
+            .replace(
+                /"/g,
+                '&quot;'
+            )
+
+            .replace(
+                /'/g,
+                '&#039;'
+            );
 
     }
 
 
+
     /*
     |--------------------------------------------------------------------------
-    | Submit Konfirmasi via AJAX
+    | SUBMIT KONFIRMASI VIA AJAX
     |--------------------------------------------------------------------------
     */
 
     document
         .getElementById('form-confirm')
-        .addEventListener('submit', function(e) {
+        .addEventListener(
+            'submit',
+            function(e)
+            {
 
-            e.preventDefault();
-
-
-            const form =
-                this;
-
-            const button =
-                form.querySelector('button[type="submit"]');
+                e.preventDefault();
 
 
-            const nik =
-                document.getElementById('nik-input').value;
-
-            const nama =
-                document.getElementById('nama').innerText;
-
-            const periode =
-                document.getElementById('periode-input').value;
+                const form =
+                    this;
 
 
-            /*
-             * Disable tombol sementara
-             */
-
-            button.disabled = true;
-
-            button.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1"></span>' +
-                'Memproses...';
+                const button =
+                    form.querySelector(
+                        'button[type="submit"]'
+                    );
 
 
-            fetch(this.action, {
+                const nik =
+                    document.getElementById(
+                        'nik-input'
+                    ).value;
 
-                method: 'POST',
 
-                headers: {
+                const nama =
+                    document.getElementById(
+                        'nama'
+                    ).innerText;
 
-                    'Content-Type':
-                        'application/json',
 
-                    'X-CSRF-TOKEN':
-                        '{{ csrf_token() }}',
+                const periode =
+                    document.getElementById(
+                        'periode-input'
+                    ).value;
 
-                    'Accept':
-                        'application/json'
 
-                },
 
-                body: JSON.stringify({
+                /*
+                 * Disable tombol
+                 */
 
-                    nik: nik,
+                button.disabled =
+                    true;
 
-                    periode: periode
+
+                button.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span>' +
+                    'Memproses...';
+
+
+
+                fetch(
+                    this.action,
+                    {
+
+                        method: 'POST',
+
+
+                        headers:
+                        {
+
+                            'Content-Type':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                '{{ csrf_token() }}',
+
+                            'Accept':
+                                'application/json'
+
+                        },
+
+
+                        body:
+                            JSON.stringify({
+
+                                nik: nik,
+
+                                periode: periode
+
+                            })
+
+                    }
+
+                )
+
+                .then(response =>
+                {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            'Terjadi kesalahan pada server.'
+                        );
+
+                    }
+
+
+                    return response.json();
 
                 })
 
-            })
+                .then(data =>
+                {
 
-            .then(response => {
+                    if (!data.success) {
 
-                if (!response.ok) {
+                        throw new Error(
+                            data.message ||
+                            'Konfirmasi gagal.'
+                        );
 
-                    throw new Error(
-                        'Terjadi kesalahan pada server.'
+                    }
+
+
+                    /*
+                     * Tambah riwayat
+                     */
+
+                    tambahRiwayat(
+                        nik,
+                        nama
                     );
 
-                }
 
-                return response.json();
+                    /*
+                     * Kembali ke scanner
+                     */
 
-            })
+                    scanLagi();
 
-            .then(data => {
+                })
 
-                if (!data.success) {
+                .catch(error =>
+                {
 
-                    throw new Error(
-                        data.message ||
-                        'Konfirmasi gagal.'
+                    console.error(error);
+
+
+                    alert(
+                        error.message ||
+                        'Terjadi kesalahan.'
                     );
 
-                }
+                })
+
+                .finally(() =>
+                {
+
+                    button.disabled =
+                        false;
 
 
-                /*
-                 * Tambah riwayat
-                 */
+                    button.innerHTML =
+                        '<i class="bi bi-check-circle-fill me-1"></i>' +
+                        'Konfirmasi Pengambilan';
 
-                tambahRiwayat(
-                    nik,
-                    nama
-                );
+                });
 
+            }
+        );
 
-                /*
-                 * Kembali ke scanner
-                 */
-
-                scanLagi();
-
-            })
-
-            .catch(error => {
-
-                console.error(error);
-
-                alert(
-                    error.message ||
-                    'Terjadi kesalahan.'
-                );
-
-            })
-
-            .finally(() => {
-
-                button.disabled = false;
-
-                button.innerHTML =
-                    '<i class="bi bi-check-circle-fill me-1"></i>' +
-                    'Konfirmasi Pengambilan';
-
-            });
-
-        });
 
 
     /*
     |--------------------------------------------------------------------------
-    | Scan Lagi
+    | SCAN LAGI
     |--------------------------------------------------------------------------
     */
 
@@ -1462,17 +1594,27 @@
     {
 
         document
-            .getElementById('hasil-scan')
-            .classList.add('d-none');
+            .getElementById(
+                'hasil-scan'
+            )
+            .classList.add(
+                'd-none'
+            );
 
 
         document
-            .getElementById('form-confirm')
-            .classList.add('d-none');
+            .getElementById(
+                'form-confirm'
+            )
+            .classList.add(
+                'd-none'
+            );
 
 
         const status =
-            document.getElementById('scan-status');
+            document.getElementById(
+                'scan-status'
+            );
 
 
         status.className =
@@ -1489,9 +1631,10 @@
     }
 
 
+
     /*
     |--------------------------------------------------------------------------
-    | Jalankan Scanner
+    | JALANKAN SCANNER
     |--------------------------------------------------------------------------
     */
 

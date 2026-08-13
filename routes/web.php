@@ -3,13 +3,24 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProfileController;
+
+// =========================================================
+// ADMIN CONTROLLERS
+// =========================================================
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 
+// =========================================================
+// OPERATOR CONTROLLERS
+// =========================================================
 use App\Http\Controllers\Operator\ScanController;
 use App\Http\Controllers\Operator\DashboardController as OperatorDashboardController;
+use App\Http\Controllers\Operator\OperatorStatistikController;
 
+// =========================================================
+// KARYAWAN CONTROLLERS
+// =========================================================
 use App\Http\Controllers\Karyawan\AuthController as KaryawanAuthController;
 use App\Http\Controllers\Karyawan\DashboardController as KaryawanDashboardController;
 
@@ -48,8 +59,6 @@ Route::middleware('auth')->group(function () {
         |--------------------------------------------------------------------------
         | ADMIN
         |--------------------------------------------------------------------------
-        | Admin langsung masuk ke halaman Laporan
-        |--------------------------------------------------------------------------
         */
 
         if ($user->role === 'admin') {
@@ -60,8 +69,6 @@ Route::middleware('auth')->group(function () {
         /*
         |--------------------------------------------------------------------------
         | OPERATOR
-        |--------------------------------------------------------------------------
-        | Operator masuk ke Dashboard Operator
         |--------------------------------------------------------------------------
         */
 
@@ -168,33 +175,46 @@ Route::middleware('auth')->group(function () {
             |--------------------------------------------------------------------------
             */
 
-            // Halaman utama laporan
             Route::get('/laporan', [LaporanController::class, 'index'])
                 ->name('laporan.index');
 
 
-            // Export Excel
+            /*
+            |--------------------------------------------------------------------------
+            | EXPORT EXCEL
+            |--------------------------------------------------------------------------
+            */
+
             Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])
                 ->name('laporan.excel');
 
 
-            // Export PDF
+            /*
+            |--------------------------------------------------------------------------
+            | EXPORT PDF
+            |--------------------------------------------------------------------------
+            */
+
             Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])
                 ->name('laporan.pdf');
 
 
             /*
             |--------------------------------------------------------------------------
-            | OPERATOR (Data User dengan role operator)
+            | KELOLA OPERATOR
             |--------------------------------------------------------------------------
             */
 
-            // Halaman utama daftar operator
             Route::get('/operator', [UserController::class, 'index'])
                 ->name('operator.index');
 
 
-            // Tambah operator
+            /*
+            |--------------------------------------------------------------------------
+            | TAMBAH OPERATOR
+            |--------------------------------------------------------------------------
+            */
+
             Route::get('/operator/create', [UserController::class, 'create'])
                 ->name('operator.create');
 
@@ -202,7 +222,12 @@ Route::middleware('auth')->group(function () {
                 ->name('operator.store');
 
 
-            // Edit operator
+            /*
+            |--------------------------------------------------------------------------
+            | EDIT OPERATOR
+            |--------------------------------------------------------------------------
+            */
+
             Route::get('/operator/{user}/edit', [UserController::class, 'edit'])
                 ->name('operator.edit');
 
@@ -210,7 +235,12 @@ Route::middleware('auth')->group(function () {
                 ->name('operator.update');
 
 
-            // Hapus operator
+            /*
+            |--------------------------------------------------------------------------
+            | HAPUS OPERATOR
+            |--------------------------------------------------------------------------
+            */
+
             Route::delete('/operator/{user}', [UserController::class, 'destroy'])
                 ->name('operator.destroy');
 
@@ -241,7 +271,21 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | SCAN
+            | STATISTIK OPERATOR
+            |--------------------------------------------------------------------------
+            |
+            | Statistik merupakan MENU / FITUR TERPISAH
+            | dari Dashboard Operator.
+            |
+            */
+
+            Route::get('/statistik', [OperatorStatistikController::class, 'index'])
+                ->name('statistik');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | SCAN BARCODE
             |--------------------------------------------------------------------------
             */
 
@@ -251,7 +295,7 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | PROSES SCAN
+            | PROSES SCAN BARCODE
             |--------------------------------------------------------------------------
             */
 
