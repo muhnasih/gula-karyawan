@@ -135,6 +135,19 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
+            | TEMPLATE & IMPORT EXCEL KARYAWAN
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/karyawan/template', [KaryawanController::class, 'downloadTemplate'])
+                ->name('karyawan.template');
+
+            Route::post('/karyawan/import', [KaryawanController::class, 'importExcel'])
+                ->name('karyawan.import');
+
+
+            /*
+            |--------------------------------------------------------------------------
             | TAMBAH KARYAWAN
             |--------------------------------------------------------------------------
             */
