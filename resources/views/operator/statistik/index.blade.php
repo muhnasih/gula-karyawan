@@ -6,451 +6,371 @@
 
 <style>
     /* =========================================================
-       STATISTIK OPERATOR - RESPONSIVE (FIXED)
+       OPERATOR STATISTIK - MINIMALIST
     ========================================================= */
 
-    .operator-statistik,
+    .operator-statistik {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
     .operator-statistik * {
         box-sizing: border-box;
     }
 
-    .operator-statistik {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-    }
+    /* =========================
+       HEADER
+    ========================= */
 
-    /* HEADER */
-    .statistik-header {
+    .page-header {
         margin-bottom: 1.5rem;
     }
 
-    .statistik-header h4 {
-        font-size: 1.4rem;
+    .page-header h4 {
+        font-size: clamp(1.1rem, 1rem + .5vw, 1.35rem);
         font-weight: 700;
-        margin-bottom: .3rem;
-        color: #212529;
+        color: #1a1a1a;
+        margin: 0 0 .3rem;
     }
 
-    .statistik-header p {
-        font-size: .9rem;
-        color: #6c757d;
-        margin-bottom: 0;
+    .page-header p {
+        color: #8a8a8a;
+        font-size: .85rem;
+        margin: 0;
     }
 
-    /* =========================================================
-       KARTU STATISTIK
-    ========================================================= */
+    /* =========================
+       STAT CARD (monokrom, tanpa warna-warni)
+    ========================= */
 
     .stat-card {
-        border: 0;
-        border-radius: 14px;
-        transition: transform .2s ease, box-shadow .2s ease;
-        overflow: hidden;
+        background: #fff;
+        border: 1px solid #ececec;
+        border-radius: 12px;
         height: 100%;
     }
 
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, .08) !important;
+    .stat-card-body {
+        padding: 1.1rem;
     }
 
-    .stat-card .card-body {
-        padding: 1.2rem 1.15rem;
+    .stat-content {
+        min-width: 0;
     }
 
     .stat-label {
         display: block;
-        color: #6c757d;
-        font-size: .8rem;
+        color: #9a9a9a;
+        font-size: .76rem;
         font-weight: 500;
-        margin-bottom: .35rem;
+        margin-bottom: .3rem;
+    }
+
+    .stat-number {
+        color: #1a1a1a;
+        font-size: clamp(1.15rem, 1rem + 1vw, 1.6rem);
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    /* Satu warna aksen saja, dipakai selektif */
+    .stat-number.accent {
+        color: #0d6efd;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 10px;
+        background: #f5f5f5;
+        color: #6a6a6a;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+
+    /* =========================
+       CONTENT CARD
+    ========================= */
+
+    .content-card {
+        border: 1px solid #ececec;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: none; /* hilangkan shadow permanen, biar flat */
+    }
+
+    .content-card .card-header {
+        background: #fff;
+        border: 0;
+        border-bottom: 1px solid #f2f2f2;
+        padding: 1rem 1.2rem;
+    }
+
+    .content-card .card-body {
+        padding: 1rem 1.2rem 1.2rem;
+    }
+
+    .section-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0;
+    }
+    /* section-subtitle dihapus - judul section sudah cukup jelas tanpa deskripsi tambahan */
+
+    /* =========================
+       FILTER
+    ========================= */
+
+    .filter-label {
+        color: #6a6a6a;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: .4rem;
+    }
+
+    .filter-form .form-control {
+        height: 42px;
+        border: 1px solid #e2e2e2;
+        border-radius: 8px;
+        font-size: .9rem;
+        box-shadow: none;
+    }
+
+    .filter-form .form-control:focus {
+        border-color: #b9b9b9;
+        box-shadow: none;
+    }
+
+    .filter-form .btn {
+        height: 42px;
+        border-radius: 8px;
+        font-size: .88rem;
+        font-weight: 600;
+        padding: 0 1.2rem;
+    }
+
+    /* =========================
+       TABLE
+    ========================= */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #ececec;
+        border-radius: 8px;
+    }
+
+    .table-wrapper table {
+        width: 100%;
+        min-width: 500px;
+        margin: 0;
+    }
+
+    .table-wrapper th {
+        background: #fafafa;
+        color: #8a8a8a;
+        border-bottom: 1px solid #ececec;
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .7rem .85rem;
+        white-space: nowrap;
+    }
+
+    .table-wrapper td {
+        color: #3a3a3a;
+        font-size: .82rem;
+        padding: .7rem .85rem;
+        vertical-align: middle;
+        white-space: nowrap;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .table-wrapper tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .table-wrapper tbody tr:hover {
+        background: #fafafa;
+    }
+
+    /* =========================
+       BADGE (flat, tanpa background solid)
+    ========================= */
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 6px;
+        padding: .28rem .55rem;
+        font-size: .68rem;
+        font-weight: 600;
+        background: transparent;
+        border: 1px solid #d8d8d8;
+        color: #4a4a4a;
+    }
+
+    .badge-status.badge-alert {
+        border-color: #e8c766;
+        color: #8a6d00;
+    }
+
+    /* =========================
+       KARYAWAN BELUM AMBIL - COMPACT LIST (tidak makan tinggi halaman)
+    ========================= */
+
+    .compact-scroll {
+        max-height: 320px;
+        overflow-y: auto;
+        border: 1px solid #ececec;
+        border-radius: 8px;
+    }
+
+    .compact-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .compact-scroll::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 6px;
+    }
+
+    .compact-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .compact-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .6rem .85rem;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .compact-item:last-child {
+        border-bottom: 0;
+    }
+
+    .compact-item:hover {
+        background: #fafafa;
+    }
+
+    .compact-main {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .compact-name {
+        font-size: .84rem;
+        font-weight: 600;
+        color: #2a2a2a;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .stat-number {
-        font-size: 1.75rem;
-        line-height: 1.15;
-        font-weight: 700;
-        color: #212529;
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        min-width: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        flex-shrink: 0;
-    }
-
-    .icon-primary {
-        color: #0d6efd;
-        background: rgba(13, 110, 253, .12);
-    }
-
-    .icon-success {
-        color: #198754;
-        background: rgba(25, 135, 84, .12);
-    }
-
-    .icon-warning {
-        color: #ffc107;
-        background: rgba(255, 193, 7, .15);
-    }
-
-    .icon-info {
-        color: #0dcaf0;
-        background: rgba(13, 202, 240, .13);
-    }
-
-    /* =========================================================
-       CARD UMUM
-    ========================================================= */
-
-    .content-card {
-        border: 0;
-        border-radius: 14px;
-        overflow: hidden;
-        max-width: 100%;
-    }
-
-    .content-card .card-header {
-        padding: 1.2rem 1.25rem .6rem;
-        background: #fff;
-        border-bottom: 0;
-    }
-
-    .content-card .card-body {
-        padding: 1.15rem 1.25rem 1.35rem;
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    .section-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #212529;
-        margin-bottom: .15rem;
-    }
-
-    .section-subtitle {
-        font-size: .82rem;
-        color: #6c757d;
-        margin-bottom: 0;
-    }
-
-    /* =========================================================
-       FILTER
-    ========================================================= */
-
-    .filter-label {
-        font-size: .85rem;
-        font-weight: 600;
-        margin-bottom: .4rem;
-        color: #495057;
-    }
-
-    .filter-form .form-control {
-        min-height: 44px;
-        border-radius: 10px;
-        font-size: .95rem;
-    }
-
-    .filter-form .btn {
-        min-height: 44px;
-        border-radius: 10px;
-        white-space: nowrap;
-        font-weight: 600;
-        padding-left: 1.4rem;
-        padding-right: 1.4rem;
-    }
-
-    /* =========================================================
-       TABLE (FIX UTAMA)
-       - Wrapper dibatasi 100% dari parent, tidak boleh melebar
-       - Tabel default mengikuti lebar wrapper (width:100%)
-       - min-width hanya dipakai di layar kecil supaya kolom
-         tidak gepeng, dan wrapper yang akan scroll, bukan
-         seluruh halaman
-    ========================================================= */
-
-    .responsive-table {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        border-radius: 8px;
-    }
-
-    .responsive-table table {
-        width: 100%;
-        min-width: 100%;
-        margin-bottom: 0;
-    }
-
-    .responsive-table th,
-    .responsive-table td {
-        white-space: nowrap;
-        vertical-align: middle;
-        padding: .8rem .9rem;
-        font-size: .875rem;
-    }
-
-    .responsive-table thead th {
-        font-size: .78rem;
-        font-weight: 600;
-        color: #6c757d;
-        background: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .responsive-table tbody tr:last-child td {
-        border-bottom: 0;
-    }
-
-    /* =========================================================
-       BADGE STATUS
-    ========================================================= */
-
-    .badge-status {
-        display: inline-flex;
-        align-items: center;
-        gap: .25rem;
+    .compact-meta {
         font-size: .72rem;
-        font-weight: 700;
-        padding: .35rem .6rem;
-        border-radius: 8px;
+        color: #9a9a9a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    /* =========================================================
+    .compact-count {
+        font-size: .76rem;
+        color: #6a6a6a;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* =========================
        EMPTY STATE
-    ========================================================= */
+    ========================= */
 
     .empty-state {
-        padding: 2.8rem 1rem;
+        padding: 2.5rem 1rem;
         text-align: center;
-        color: #6c757d;
+        color: #9a9a9a;
     }
 
     .empty-state i {
-        font-size: 2.6rem;
         display: block;
-        margin-bottom: .85rem;
-        opacity: .7;
+        font-size: 2rem;
+        margin-bottom: .6rem;
+        opacity: .4;
     }
 
     .empty-state div {
-        font-size: .9rem;
+        font-size: .82rem;
     }
 
-    /* =========================================================
-       TABLET (≤ 991px)
-    ========================================================= */
+    /* =========================
+       SPACING
+    ========================= */
 
-    @media (max-width: 991.98px) {
-
-        .container-fluid {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        .stat-card .card-body {
-            padding: 1.05rem 1rem;
-        }
-
-        .stat-number {
-            font-size: 1.55rem;
-        }
-
-        .stat-icon {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            font-size: 1.25rem;
-        }
+    .section-gap {
+        margin-top: 1.25rem !important;
     }
 
-    /* =========================================================
-       HP (≤ 575px)
-    ========================================================= */
+    /* =========================
+       RESPONSIVE (disederhanakan, pakai clamp untuk font)
+    ========================= */
 
     @media (max-width: 575.98px) {
 
-        .operator-statistik {
-            padding: 0;
+        .operator-statistik .container-fluid {
+            padding: 1rem .75rem 1.5rem !important;
         }
 
-        .container-fluid {
-            padding-left: .75rem !important;
-            padding-right: .75rem !important;
-            padding-top: 1.1rem !important;
-            padding-bottom: 1.5rem !important;
-        }
-
-        /* Header */
-        .statistik-header {
-            margin-bottom: 1.15rem;
-        }
-
-        .statistik-header h4 {
-            font-size: 1.2rem;
-        }
-
-        .statistik-header p {
-            font-size: .8rem;
-            line-height: 1.45;
-        }
-
-        /* Statistik cards */
         .row.g-3 {
-            --bs-gutter-x: .7rem;
-            --bs-gutter-y: .7rem;
+            --bs-gutter-x: .65rem;
+            --bs-gutter-y: .65rem;
         }
 
-        .stat-card {
-            border-radius: 12px;
-        }
-
-        .stat-card .card-body {
-            padding: .95rem .85rem;
-        }
-
-        .stat-label {
-            font-size: .72rem;
-            margin-bottom: .25rem;
-        }
-
-        .stat-number {
-            font-size: 1.35rem;
+        .stat-card-body {
+            padding: .85rem;
         }
 
         .stat-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-        }
-
-        /* Content cards */
-        .content-card {
-            border-radius: 12px;
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            font-size: .95rem;
         }
 
         .content-card .card-header {
-            padding: 1.05rem 1rem .4rem;
+            padding: .85rem .9rem;
         }
 
         .content-card .card-body {
-            padding: 1rem;
-        }
-
-        .section-title {
-            font-size: .98rem;
-        }
-
-        .section-subtitle {
-            font-size: .76rem;
-            line-height: 1.4;
-        }
-
-        /* Filter */
-        .filter-form .form-control {
-            width: 100%;
-            min-height: 46px;
-            font-size: 1rem;
+            padding: .9rem;
         }
 
         .filter-form .btn {
             width: 100%;
-            min-height: 46px;
-            margin-top: .35rem;
         }
 
-        /* Table: baru di sini kita paksa min-width supaya kolom
-           tidak gepeng, wrapper yang scroll horizontal, bukan
-           body/halaman */
-        .responsive-table {
-            margin-left: -.5rem;
-            margin-right: -.5rem;
-            width: calc(100% + 1rem);
-            border-radius: 0;
+        .table-wrapper table {
+            min-width: 520px;
         }
 
-        .responsive-table table {
-            min-width: 540px;
+        .table-wrapper th,
+        .table-wrapper td {
+            padding: .6rem .7rem;
+            font-size: .75rem;
         }
 
-        .responsive-table th,
-        .responsive-table td {
-            padding: .7rem .75rem;
-            font-size: .8rem;
-        }
-
-        .responsive-table thead th {
-            font-size: .72rem;
-        }
-
-        /* Empty state */
-        .empty-state {
-            padding: 2.2rem .75rem;
-        }
-
-        .empty-state i {
-            font-size: 2.3rem;
-        }
-
-        .empty-state div {
-            font-size: .82rem;
-        }
-    }
-
-    /* =========================================================
-       HP SANGAT KECIL (≤ 380px)
-    ========================================================= */
-
-    @media (max-width: 380px) {
-
-        .container-fluid {
-            padding-left: .6rem !important;
-            padding-right: .6rem !important;
-        }
-
-        .stat-card .card-body {
-            padding: .8rem .7rem;
-        }
-
-        .stat-label {
-            font-size: .68rem;
-        }
-
-        .stat-number {
-            font-size: 1.2rem;
-        }
-
-        .stat-icon {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            font-size: 1rem;
-            border-radius: 9px;
-        }
-
-        .content-card .card-header,
-        .content-card .card-body {
-            padding-left: .85rem;
-            padding-right: .85rem;
-        }
-
-        .responsive-table table {
-            min-width: 480px;
+        .section-gap {
+            margin-top: 1rem !important;
         }
     }
 </style>
@@ -463,31 +383,36 @@
         {{-- =====================================================
             HEADER
         ====================================================== --}}
-        <div class="statistik-header">
+
+        <div class="page-header">
             <h4>Statistik Operator</h4>
-            <p class="text-muted mb-0">
+
+            <p>
                 Statistik pengambilan gula periode
-                {{ \Carbon\Carbon::createFromFormat('Y-m', $periode)->translatedFormat('F Y') }}
+                <strong>
+                    {{ \Carbon\Carbon::createFromFormat('Y-m', $periode)->translatedFormat('F Y') }}
+                </strong>
             </p>
         </div>
 
 
         {{-- =====================================================
-            KARTU STATISTIK
+            STATISTIK — monokrom, satu warna aksen di angka utama
         ====================================================== --}}
+
         <div class="row g-3">
 
             {{-- Total Karyawan --}}
             <div class="col-6 col-xl-3">
-                <div class="card shadow-sm h-100 stat-card">
-                    <div class="card-body">
+                <div class="stat-card">
+                    <div class="stat-card-body">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <div class="min-w-0">
+                            <div class="stat-content">
                                 <span class="stat-label">Total Karyawan</span>
                                 <div class="stat-number">{{ $statistik['total_karyawan'] }}</div>
                             </div>
-                            <div class="stat-icon icon-primary">
-                                <i class="bi bi-people-fill"></i>
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
                             </div>
                         </div>
                     </div>
@@ -496,15 +421,15 @@
 
             {{-- Sudah Mengambil --}}
             <div class="col-6 col-xl-3">
-                <div class="card shadow-sm h-100 stat-card">
-                    <div class="card-body">
+                <div class="stat-card">
+                    <div class="stat-card-body">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <div class="min-w-0">
+                            <div class="stat-content">
                                 <span class="stat-label">Sudah Mengambil</span>
                                 <div class="stat-number">{{ $statistik['sudah_ambil'] }}</div>
                             </div>
-                            <div class="stat-icon icon-success">
-                                <i class="bi bi-check-circle-fill"></i>
+                            <div class="stat-icon">
+                                <i class="bi bi-check-lg"></i>
                             </div>
                         </div>
                     </div>
@@ -513,32 +438,32 @@
 
             {{-- Belum Mengambil --}}
             <div class="col-6 col-xl-3">
-                <div class="card shadow-sm h-100 stat-card">
-                    <div class="card-body">
+                <div class="stat-card">
+                    <div class="stat-card-body">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <div class="min-w-0">
+                            <div class="stat-content">
                                 <span class="stat-label">Belum Mengambil</span>
                                 <div class="stat-number">{{ $statistik['belum_ambil'] }}</div>
                             </div>
-                            <div class="stat-icon icon-warning">
-                                <i class="bi bi-clock-fill"></i>
+                            <div class="stat-icon">
+                                <i class="bi bi-clock"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Persentase --}}
+            {{-- Persentase — satu-satunya angka dengan warna aksen, sebagai fokus utama --}}
             <div class="col-6 col-xl-3">
-                <div class="card shadow-sm h-100 stat-card">
-                    <div class="card-body">
+                <div class="stat-card">
+                    <div class="stat-card-body">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <div class="min-w-0">
+                            <div class="stat-content">
                                 <span class="stat-label">Persentase</span>
-                                <div class="stat-number">{{ $statistik['persentase_sudah'] }}%</div>
+                                <div class="stat-number accent">{{ $statistik['persentase_sudah'] }}%</div>
                             </div>
-                            <div class="stat-icon icon-info">
-                                <i class="bi bi-bar-chart-fill"></i>
+                            <div class="stat-icon">
+                                <i class="bi bi-bar-chart"></i>
                             </div>
                         </div>
                     </div>
@@ -551,18 +476,16 @@
         {{-- =====================================================
             FILTER PERIODE
         ====================================================== --}}
-        <div class="card shadow-sm mt-4 content-card">
+
+        <div class="card content-card section-gap">
             <div class="card-body">
                 <form method="GET"
                       action="{{ route('operator.statistik') }}"
                       class="row g-3 align-items-end filter-form">
 
                     <div class="col-12 col-md-5 col-lg-4">
-                        <label class="form-label filter-label">Pilih Periode</label>
-                        <input type="month"
-                               name="periode"
-                               value="{{ $periode }}"
-                               class="form-control">
+                        <label class="filter-label">Periode</label>
+                        <input type="month" name="periode" value="{{ $periode }}" class="form-control">
                     </div>
 
                     <div class="col-12 col-md-auto">
@@ -578,18 +501,20 @@
 
 
         {{-- =====================================================
-            PENGAMBILAN HARIAN
+            PENGAMBILAN PER HARI
         ====================================================== --}}
-        <div class="card shadow-sm mt-4 content-card">
+
+        <div class="card content-card section-gap">
+
             <div class="card-header">
                 <div class="section-title">Pengambilan Per Hari</div>
-                <div class="section-subtitle">Data pengambilan gula pada periode terpilih</div>
             </div>
 
             <div class="card-body">
+
                 @if($pengambilanHarian->count() > 0)
-                    <div class="responsive-table">
-                        <table class="table table-hover align-middle mb-0">
+                    <div class="table-wrapper">
+                        <table class="table table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>Tanggal</th>
@@ -612,23 +537,26 @@
                         <div>Belum ada data pengambilan pada periode ini.</div>
                     </div>
                 @endif
+
             </div>
         </div>
 
 
         {{-- =====================================================
-            PENGAMBILAN PER STATUS KARYAWAN
+            PER STATUS KARYAWAN
         ====================================================== --}}
-        <div class="card shadow-sm mt-4 content-card">
+
+        <div class="card content-card section-gap">
+
             <div class="card-header">
                 <div class="section-title">Pengambilan per Status Karyawan</div>
-                <div class="section-subtitle">Jumlah pengambilan dikelompokkan berdasarkan status (KARPIM/KARPEL)</div>
             </div>
 
             <div class="card-body">
+
                 @if($perStatus->count() > 0)
-                    <div class="responsive-table">
-                        <table class="table table-hover align-middle mb-0">
+                    <div class="table-wrapper">
+                        <table class="table table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>Status</th>
@@ -638,7 +566,7 @@
                             <tbody>
                                 @foreach($perStatus as $item)
                                     <tr>
-                                        <td>{{ $item['status'] }}</td>
+                                        <td><span class="badge-status">{{ $item['status'] }}</span></td>
                                         <td class="text-end fw-semibold">{{ $item['total'] }}</td>
                                     </tr>
                                 @endforeach
@@ -651,6 +579,7 @@
                         <div>Belum ada data pengambilan pada periode ini.</div>
                     </div>
                 @endif
+
             </div>
         </div>
 
@@ -658,16 +587,18 @@
         {{-- =====================================================
             PENGAMBILAN TERBARU
         ====================================================== --}}
-        <div class="card shadow-sm mt-4 content-card">
+
+        <div class="card content-card section-gap">
+
             <div class="card-header">
                 <div class="section-title">Pengambilan Terbaru</div>
-                <div class="section-subtitle">10 transaksi pengambilan terakhir</div>
             </div>
 
             <div class="card-body">
+
                 @if($pengambilanTerbaru->count() > 0)
-                    <div class="responsive-table">
-                        <table class="table table-hover align-middle mb-0">
+                    <div class="table-wrapper">
+                        <table class="table table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -686,11 +617,7 @@
                                         <td>{{ $item->karyawan->nik ?? '-' }}</td>
                                         <td class="fw-semibold">{{ $item->karyawan->nama ?? '-' }}</td>
                                         <td>{{ $item->karyawan->bagian ?? '-' }}</td>
-                                        <td>
-                                            <span class="badge bg-secondary badge-status">
-                                                {{ $item->karyawan->status ?? '-' }}
-                                            </span>
-                                        </td>
+                                        <td><span class="badge-status">{{ $item->karyawan->status ?? '-' }}</span></td>
                                         <td class="text-end fw-semibold">{{ $item->jumlah_gula ?? 0 }} KG</td>
                                         <td>{{ $item->tanggal_ambil?->translatedFormat('d F Y') ?? '-' }}</td>
                                     </tr>
@@ -704,6 +631,7 @@
                         <div>Belum ada data pengambilan.</div>
                     </div>
                 @endif
+
             </div>
         </div>
 
@@ -711,41 +639,40 @@
         {{-- =====================================================
             KARYAWAN BELUM MENGAMBIL
         ====================================================== --}}
-        <div class="card shadow-sm mt-4 content-card">
-            <div class="card-header">
+
+        <div class="card content-card section-gap">
+
+            <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="section-title">Karyawan Belum Mengambil</div>
-                <div class="section-subtitle">Daftar karyawan aktif yang belum mengambil jatah pada periode ini</div>
+                @if($karyawanBelumAmbil->count() > 0)
+                    <span class="compact-count">{{ $karyawanBelumAmbil->count() }} orang</span>
+                @endif
             </div>
 
             <div class="card-body">
+
+                {{-- Dibuat compact list dengan scroll internal (max-height 320px)
+                     supaya section ini tidak mendorong halaman jadi panjang,
+                     baik di laptop maupun HP. Semua data tetap bisa diakses
+                     lewat scroll DI DALAM kotak, bukan scroll seluruh halaman. --}}
+
                 @if($karyawanBelumAmbil->count() > 0)
-                    <div class="responsive-table">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>NIK</th>
-                                    <th>Nama Karyawan</th>
-                                    <th>Bagian</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($karyawanBelumAmbil as $index => $karyawan)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $karyawan->nik ?? '-' }}</td>
-                                        <td class="fw-semibold">{{ $karyawan->nama ?? '-' }}</td>
-                                        <td>{{ $karyawan->bagian ?? '-' }}</td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark badge-status">
-                                                {{ $karyawan->status ?? '-' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="compact-scroll">
+                        <div class="compact-list">
+                            @foreach($karyawanBelumAmbil as $index => $karyawan)
+                                <div class="compact-item">
+                                    <div class="compact-main">
+                                        <div class="compact-name">
+                                            {{ $index + 1 }}. {{ $karyawan->nama ?? '-' }}
+                                        </div>
+                                        <div class="compact-meta">
+                                            {{ $karyawan->nik ?? '-' }} &middot; {{ $karyawan->bagian ?? '-' }}
+                                        </div>
+                                    </div>
+                                    <span class="badge-status badge-alert">{{ $karyawan->status ?? '-' }}</span>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 @else
                     <div class="empty-state">
@@ -753,10 +680,12 @@
                         <div>Semua karyawan sudah mengambil jatah pada periode ini.</div>
                     </div>
                 @endif
+
             </div>
         </div>
 
     </div>
+
 </div>
 
 @endsection
