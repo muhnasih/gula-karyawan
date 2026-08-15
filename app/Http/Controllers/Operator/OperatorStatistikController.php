@@ -101,140 +101,17 @@ class OperatorStatistikController extends Controller
 
 
         // =========================================================
-        // PERSENTASE SUDAH MENGAMBIL
+        // TOTAL KILO PADA BULAN TERPILIH
+        // =========================================================
+        // Menggantikan kartu "Persentase" -> sekarang menampilkan
+        // total kg gula yang sudah diambil pada periode terpilih.
         // =========================================================
 
-        $persentaseSudah = $totalKaryawan > 0
-            ? round(
-                ($sudahAmbil / $totalKaryawan) * 100,
-                2
-            )
-            : 0;
+        $totalKg = (clone $pengambilanQuery)->sum('jumlah_gula');
 
 
         // =========================================================
-        // PERSENTASE BELUM MENGAMBIL
-        // =========================================================
-
-        $persentaseBelum = $totalKaryawan > 0
-            ? round(
-                ($belumAmbil / $totalKaryawan) * 100,
-                2
-            )
-            : 0;
-
-
-        // =========================================================
-        // PENGAMBILAN PER HARI
-        // =========================================================
-
-        $pengambilanHarian = (clone $pengambilanQuery)
-            ->selectRaw(
-                'tanggal_ambil, COUNT(*) as total'
-            )
-            ->groupBy('tanggal_ambil')
-            ->orderBy('tanggal_ambil')
-            ->get();
-
-
-        // =========================================================
-        // DATA GRAFIK
-        // =========================================================
-
-        $chartLabels = $pengambilanHarian
-            ->map(function ($item) {
-
-                return Carbon::parse(
-                    $item->tanggal_ambil
-                )->format('d M');
-
-            })
-            ->values();
-
-
-        $chartData = $pengambilanHarian
-            ->pluck('total')
-            ->values();
-
-
-        // =========================================================
-        // PENGAMBILAN PER BAGIAN
-        // =========================================================
-
-        $perBagian = (clone $pengambilanQuery)
-            ->with('karyawan')
-            ->get()
-            ->filter(function ($item) {
-
-                return $item->karyawan !== null;
-
-            })
-            ->groupBy(function ($item) {
-
-                return $item->karyawan->bagian
-                    ?: 'Tidak Ada Bagian';
-
-            })
-            ->map(function ($items, $bagian) {
-
-                return [
-                    'bagian' => $bagian,
-                    'total' => $items->count(),
-                ];
-
-            })
-            ->values();
-
-
-        // =========================================================
-        // PENGAMBILAN PER STATUS KARYAWAN
-        // =========================================================
-        // Sebelumnya dikelompokkan berdasarkan 'kategori' (Tetap/OS/
-        // KAMP-PKWT), padahal jatah gula sebenarnya ditentukan oleh
-        // kolom 'status' (KARPIM/KARPEL). Diganti supaya laporan ini
-        // mencerminkan pengelompokan yang benar-benar dipakai untuk
-        // menentukan jumlah jatah gula.
-        // =========================================================
-
-        $perStatus = (clone $pengambilanQuery)
-            ->with('karyawan')
-            ->get()
-            ->filter(function ($item) {
-
-                return $item->karyawan !== null;
-
-            })
-            ->groupBy(function ($item) {
-
-                return $item->karyawan->status
-                    ?: 'Tidak Ada Status';
-
-            })
-            ->map(function ($items, $status) {
-
-                return [
-                    'status' => $status,
-                    'total' => $items->count(),
-                ];
-
-            })
-            ->values();
-
-
-        // =========================================================
-        // 10 PENGAMBILAN TERBARU
-        // =========================================================
-
-        $pengambilanTerbaru = (clone $pengambilanQuery)
-            ->with('karyawan')
-            ->latest('tanggal_ambil')
-            ->latest('id')
-            ->take(10)
-            ->get();
-
-
-        // =========================================================
-        // KARYAWAN YANG SUDAH MENGAMBIL
+        // KARYAWAN YANG SUDAH MENGAMBIL (BULAN TERPILIH)
         // =========================================================
 
         $karyawanSudahAmbilIds = (clone $pengambilanQuery)
@@ -259,6 +136,36 @@ class OperatorStatistikController extends Controller
 
 
         // =========================================================
+        // DAFTAR "SUDAH MENGAMBIL" (FILTER RENTANG TANGGAL)
+        // =========================================================
+        // Tidak dibatasi ke periode/bulan yang dipilih di atas -
+        // ini adalah daftar keseluruhan pengambilan yang bisa
+        // difilter bebas dari tanggal berapa sampai tanggal berapa.
+        // Kalau tanggal_awal / tanggal_akhir tidak diisi, seluruh
+        // riwayat pengambilan akan ditampilkan.
+        // =========================================================
+
+        $tanggalAwal = $request->get('tanggal_awal');
+        $tanggalAkhir = $request->get('tanggal_akhir');
+
+        $daftarSudahAmbilQuery = PengambilanGula::with('karyawan')
+            ->latest('tanggal_ambil')
+            ->latest('id');
+
+        if ($tanggalAwal) {
+            $daftarSudahAmbilQuery->whereDate('tanggal_ambil', '>=', $tanggalAwal);
+        }
+
+        if ($tanggalAkhir) {
+            $daftarSudahAmbilQuery->whereDate('tanggal_ambil', '<=', $tanggalAkhir);
+        }
+
+        $daftarSudahAmbil = (clone $daftarSudahAmbilQuery)->get();
+
+        $totalGulaSudahAmbil = (clone $daftarSudahAmbilQuery)->sum('jumlah_gula');
+
+
+        // =========================================================
         // STATISTIK
         // =========================================================
 
@@ -272,9 +179,7 @@ class OperatorStatistikController extends Controller
 
             'belum_ambil' => $belumAmbil,
 
-            'persentase_sudah' => $persentaseSudah,
-
-            'persentase_belum' => $persentaseBelum,
+            'total_kg' => $totalKg,
 
         ];
 
@@ -290,13 +195,11 @@ class OperatorStatistikController extends Controller
                 'tahun',
                 'bulan',
                 'statistik',
-                'pengambilanHarian',
-                'chartLabels',
-                'chartData',
-                'perBagian',
-                'perStatus',
-                'pengambilanTerbaru',
-                'karyawanBelumAmbil'
+                'karyawanBelumAmbil',
+                'daftarSudahAmbil',
+                'totalGulaSudahAmbil',
+                'tanggalAwal',
+                'tanggalAkhir'
             )
         );
     }

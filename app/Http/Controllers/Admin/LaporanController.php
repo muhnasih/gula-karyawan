@@ -8,18 +8,32 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
+    /**
+     * =========================================================
+     * HALAMAN LAPORAN
+     * =========================================================
+     */
     public function index(Request $request)
     {
-        $laporan   = $this->getLaporanQuery($request)->get();
+        $laporan = $this->getLaporanQuery($request)->get();
+
         $statistik = $this->getStatistik($request);
 
-        return view('admin.laporan.index', compact('laporan', 'statistik'));
+        return view(
+            'admin.laporan.index',
+            compact('laporan', 'statistik')
+        );
     }
 
+
+    /**
+     * =========================================================
+     * EXPORT EXCEL
+     * =========================================================
+     */
     public function exportExcel(Request $request)
     {
         return Excel::download(
@@ -28,95 +42,292 @@ class LaporanController extends Controller
         );
     }
 
-    public function exportPdf(Request $request)
-    {
-        $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik($request);
-
-        $pdf = Pdf::loadView('admin.laporan.export.pdf', compact('laporan', 'statistik'));
-        $pdf->setPaper('A4', 'landscape');
-
-        return $pdf->download('laporan-pengambilan-gula.pdf');
-    }
-
-    public function previewPdf(Request $request)
-    {
-        $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik($request);
-
-        return view('admin.laporan.pdf', compact('laporan', 'statistik'));
-    }
-
-    public function downloadPdf(Request $request)
-    {
-        $laporan   = $this->getLaporanQuery($request)->get();
-        $statistik = $this->getStatistik($request);
-
-        $pdf = Pdf::loadView('admin.laporan.pdf', compact('laporan', 'statistik'));
-        $pdf->setPaper('A4', 'landscape');
-
-        return $pdf->download('laporan-pengambilan-gula.pdf');
-    }
 
     /**
-     * Build query laporan dengan filter
+     * =========================================================
+     * EXPORT PDF
+     * =========================================================
+     */
+    public function exportPdf(Request $request)
+    {
+        $laporan = $this->getLaporanQuery($request)->get();
+
+        $statistik = $this->getStatistik($request);
+
+        $pdf = Pdf::loadView(
+            'admin.laporan.export.pdf',
+            compact('laporan', 'statistik')
+        );
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->download(
+            'laporan-pengambilan-gula.pdf'
+        );
+    }
+
+
+    /**
+     * =========================================================
+     * PREVIEW PDF
+     * =========================================================
+     */
+    public function previewPdf(Request $request)
+    {
+        $laporan = $this->getLaporanQuery($request)->get();
+
+        $statistik = $this->getStatistik($request);
+
+        return view(
+            'admin.laporan.pdf',
+            compact('laporan', 'statistik')
+        );
+    }
+
+
+    /**
+     * =========================================================
+     * DOWNLOAD PDF
+     * =========================================================
+     */
+    public function downloadPdf(Request $request)
+    {
+        $laporan = $this->getLaporanQuery($request)->get();
+
+        $statistik = $this->getStatistik($request);
+
+        $pdf = Pdf::loadView(
+            'admin.laporan.pdf',
+            compact('laporan', 'statistik')
+        );
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->download(
+            'laporan-pengambilan-gula.pdf'
+        );
+    }
+
+
+    /**
+     * =========================================================
+     * QUERY LAPORAN
+     * =========================================================
+     *
+     * Menampilkan data pengambilan gula sesuai filter tanggal.
      */
     private function getLaporanQuery(Request $request)
     {
         $query = DB::table('pengambilan_gula')
-            ->join('karyawan', 'karyawan.id', '=', 'pengambilan_gula.karyawan_id')
+            ->join(
+                'karyawan',
+                'karyawan.id',
+                '=',
+                'pengambilan_gula.karyawan_id'
+            )
             ->select(
                 'karyawan.nik',
                 'karyawan.nama',
                 'karyawan.kategori',
                 'karyawan.bagian',
                 'pengambilan_gula.tanggal_ambil',
-                'pengambilan_gula.jumlah_gula'   // ← ditambahkan
+                'pengambilan_gula.jumlah_gula'
             );
 
-        // Filter tanggal awal
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER TANGGAL AWAL
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('tanggal_awal')) {
-            $query->whereDate('pengambilan_gula.tanggal_ambil', '>=', $request->tanggal_awal);
+
+            $query->whereDate(
+                'pengambilan_gula.tanggal_ambil',
+                '>=',
+                $request->tanggal_awal
+            );
         }
 
-        // Filter tanggal akhir
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER TANGGAL AKHIR
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('tanggal_akhir')) {
-            $query->whereDate('pengambilan_gula.tanggal_ambil', '<=', $request->tanggal_akhir);
+
+            $query->whereDate(
+                'pengambilan_gula.tanggal_ambil',
+                '<=',
+                $request->tanggal_akhir
+            );
         }
 
-        // Filter status "sudah" / "belum" diganti jadi filter berdasarkan apakah ada data
-        // Karena ini join ke pengambilan_gula, yang muncul di sini otomatis sudah ambil.
-        // Kalau mau tampilkan yang belum ambil, harus pakai leftJoin + whereNull (lebih kompleks).
 
-        return $query->orderBy('karyawan.nama', 'asc');
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER STATUS
+        |--------------------------------------------------------------------------
+        |
+        | Karena tabel pengambilan_gula hanya berisi data yang sudah mengambil,
+        | maka:
+        |
+        | sudah = tampilkan data pengambilan
+        | belum = tidak ada data pengambilan
+        |
+        | Untuk sementara filter "belum" dikosongkan.
+        |
+        */
+        if ($request->filled('status')) {
+
+            if ($request->status === 'belum') {
+
+                // Tidak ada data pengambilan
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | URUTKAN BERDASARKAN NAMA
+        |--------------------------------------------------------------------------
+        */
+        $query->orderBy(
+            'karyawan.nama',
+            'asc'
+        );
+
+
+        return $query;
     }
 
+
     /**
-     * Get data statistik (bisa difilter tanggal juga)
+     * =========================================================
+     * STATISTIK LAPORAN
+     * =========================================================
      */
     private function getStatistik(Request $request = null)
     {
-        $totalKaryawan = DB::table('karyawan')->count();
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL SELURUH KARYAWAN
+        |--------------------------------------------------------------------------
+        */
+        $totalKaryawan = DB::table('karyawan')
+            ->count();
 
-        $sudahAmbilQuery = DB::table('pengambilan_gula')
-            ->select('karyawan_id')
-            ->distinct();
 
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY PENGAMBILAN BERDASARKAN PERIODE
+        |--------------------------------------------------------------------------
+        */
+        $pengambilanQuery = DB::table('pengambilan_gula');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER TANGGAL AWAL
+        |--------------------------------------------------------------------------
+        */
         if ($request && $request->filled('tanggal_awal')) {
-            $sudahAmbilQuery->whereDate('tanggal_ambil', '>=', $request->tanggal_awal);
+
+            $pengambilanQuery->whereDate(
+                'tanggal_ambil',
+                '>=',
+                $request->tanggal_awal
+            );
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER TANGGAL AKHIR
+        |--------------------------------------------------------------------------
+        */
         if ($request && $request->filled('tanggal_akhir')) {
-            $sudahAmbilQuery->whereDate('tanggal_ambil', '<=', $request->tanggal_akhir);
+
+            $pengambilanQuery->whereDate(
+                'tanggal_ambil',
+                '<=',
+                $request->tanggal_akhir
+            );
         }
 
-        $sudahAmbil = $sudahAmbilQuery->count();
 
+        /*
+        |--------------------------------------------------------------------------
+        | JUMLAH KARYAWAN YANG SUDAH MENGAMBIL
+        |--------------------------------------------------------------------------
+        |
+        | DISTINCT agar satu karyawan tidak dihitung dua kali.
+        |
+        */
+        $sudahAmbil = (clone $pengambilanQuery)
+            ->distinct('karyawan_id')
+            ->count('karyawan_id');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | BELUM MENGAMBIL
+        |--------------------------------------------------------------------------
+        */
+        $belumAmbil = max(
+            0,
+            $totalKaryawan - $sudahAmbil
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL GULA
+        |--------------------------------------------------------------------------
+        |
+        | INI BAGIAN YANG DIPERBAIKI.
+        |
+        | Sekarang total gula mengikuti filter tanggal.
+        |
+        | Contoh:
+        |
+        | 01-07-2026 s/d 30-07-2026
+        |
+        | Maka hanya jumlah_gula pada periode tersebut yang dijumlahkan.
+        |
+        */
+        $totalGula = (clone $pengambilanQuery)
+            ->whereNotNull('jumlah_gula')
+            ->sum('jumlah_gula');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENSIUN
+        |--------------------------------------------------------------------------
+        */
+        $pensiun = DB::table('karyawan')
+            ->where('status', 'pensiun')
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN STATISTIK
+        |--------------------------------------------------------------------------
+        */
         return [
             'totalKaryawan' => $totalKaryawan,
-            'sudahAmbil'    => $sudahAmbil,
-            'belumAmbil'    => $totalKaryawan - $sudahAmbil,
-            'pensiun'       => DB::table('karyawan')->where('status', 'pensiun')->count(),
-            'totalGula'     => DB::table('pengambilan_gula')->sum('jumlah_gula'), // bonus
+
+            'sudahAmbil' => $sudahAmbil,
+
+            'belumAmbil' => $belumAmbil,
+
+            'pensiun' => $pensiun,
+
+            'totalGula' => $totalGula,
         ];
     }
 }

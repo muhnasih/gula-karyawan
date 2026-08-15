@@ -86,21 +86,6 @@
         color: #0d6efd;
     }
 
-    .stat-progress {
-        height: 4px;
-        background: #f0f0f0;
-        border-radius: 4px;
-        margin-top: .55rem;
-        overflow: hidden;
-    }
-
-    .stat-progress-bar {
-        height: 100%;
-        background: #0d6efd;
-        border-radius: 4px;
-        transition: width .4s ease;
-    }
-
     .stat-icon {
         width: 42px;
         height: 42px;
@@ -189,53 +174,6 @@
     }
 
     /* =========================
-       TABLE
-    ========================= */
-
-    .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border: 1px solid #ececec;
-        border-radius: 10px;
-    }
-
-    .table-wrapper table {
-        width: 100%;
-        min-width: 480px;
-        margin: 0;
-    }
-
-    .table-wrapper th {
-        background: #fafafa;
-        color: #8a8a8a;
-        border-bottom: 1px solid #ececec;
-        font-size: .72rem;
-        font-weight: 600;
-        padding: .75rem .9rem;
-        white-space: nowrap;
-        letter-spacing: .02em;
-        text-transform: uppercase;
-    }
-
-    .table-wrapper td {
-        color: #3a3a3a;
-        font-size: .83rem;
-        padding: .75rem .9rem;
-        vertical-align: middle;
-        white-space: nowrap;
-        border-bottom: 1px solid #f5f5f5;
-    }
-
-    .table-wrapper tbody tr:last-child td {
-        border-bottom: 0;
-    }
-
-    .table-wrapper tbody tr:hover {
-        background: #fafafa;
-    }
-
-    /* =========================
        BADGE
     ========================= */
 
@@ -249,6 +187,7 @@
         background: #f7f7f7;
         border: 1px solid #e5e5e5;
         color: #4a4a4a;
+        white-space: nowrap;
     }
 
     .badge-status.badge-alert {
@@ -321,6 +260,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
         margin-top: .1rem;
+    }
+
+    .compact-trailing {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-shrink: 0;
     }
 
     .compact-count {
@@ -406,16 +352,6 @@
             width: 100%;
         }
 
-        .table-wrapper table {
-            min-width: 500px;
-        }
-
-        .table-wrapper th,
-        .table-wrapper td {
-            padding: .65rem .75rem;
-            font-size: .78rem;
-        }
-
         .section-gap {
             margin-top: 1.1rem !important;
         }
@@ -499,20 +435,17 @@
                 </div>
             </div>
 
-            {{-- Persentase --}}
+            {{-- Total Kilo (dulunya Persentase) --}}
             <div class="col-6 col-xl-3">
                 <div class="stat-card">
                     <div class="stat-card-body">
                         <div class="d-flex justify-content-between align-items-center gap-2">
                             <div class="stat-content">
-                                <span class="stat-label">Persentase</span>
-                                <div class="stat-number accent">{{ $statistik['persentase_sudah'] }}%</div>
-                                <div class="stat-progress">
-                                    <div class="stat-progress-bar" style="width: {{ min($statistik['persentase_sudah'], 100) }}%"></div>
-                                </div>
+                                <span class="stat-label">Total Kilo</span>
+                                <div class="stat-number accent">{{ $statistik['total_kg'] ?? 0 }} Kg</div>
                             </div>
                             <div class="stat-icon accent">
-                                <i class="bi bi-bar-chart"></i>
+                                <i class="bi bi-box-seam"></i>
                             </div>
                         </div>
                     </div>
@@ -523,150 +456,69 @@
 
 
         {{-- =====================================================
-            FILTER PERIODE
+            SUDAH MENGAMBIL (filter rentang tanggal)
         ====================================================== --}}
 
         <div class="card content-card section-gap">
+            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="section-title">Sudah Mengambil</div>
+                @if($daftarSudahAmbil->count() > 0)
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="compact-count">{{ $daftarSudahAmbil->count() }} orang</span>
+                        <span class="compact-count">Total {{ $totalGulaSudahAmbil ?? 0 }} Kg</span>
+                    </div>
+                @endif
+            </div>
             <div class="card-body">
+
                 <form method="GET"
                       action="{{ route('operator.statistik') }}"
-                      class="row g-3 align-items-end filter-form">
+                      class="row g-3 align-items-end filter-form mb-3">
 
-                    <div class="col-12 col-md-5 col-lg-4">
-                        <label class="filter-label">Periode</label>
-                        <input type="month" name="periode" value="{{ $periode }}" class="form-control">
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <label class="filter-label">Dari Tanggal</label>
+                        <input type="date" name="tanggal_awal" value="{{ $tanggalAwal ?? '' }}" class="form-control">
+                    </div>
+
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <label class="filter-label">Sampai Tanggal</label>
+                        <input type="date" name="tanggal_akhir" value="{{ $tanggalAkhir ?? '' }}" class="form-control">
                     </div>
 
                     <div class="col-12 col-md-auto">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search me-1"></i>
-                            Tampilkan
+                            Filter
                         </button>
                     </div>
 
                 </form>
-            </div>
-        </div>
 
-
-        {{-- =====================================================
-            PENGAMBILAN PER HARI
-        ====================================================== --}}
-
-        <div class="card content-card section-gap">
-            <div class="card-header">
-                <div class="section-title">Pengambilan Per Hari</div>
-            </div>
-            <div class="card-body">
-                @if($pengambilanHarian->count() > 0)
-                    <div class="table-wrapper">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th class="text-end">Jumlah Pengambilan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($pengambilanHarian as $item)
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($item->tanggal_ambil)->translatedFormat('d F Y') }}</td>
-                                        <td class="text-end fw-semibold">{{ $item->total }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                @if($daftarSudahAmbil->count() > 0)
+                    <div class="compact-scroll">
+                        <div class="compact-list">
+                            @foreach($daftarSudahAmbil as $index => $item)
+                                <div class="compact-item">
+                                    <div class="compact-main">
+                                        <div class="compact-name">
+                                            {{ $index + 1 }}. {{ $item->karyawan->nama ?? '-' }}
+                                        </div>
+                                        <div class="compact-meta">
+                                            {{ $item->karyawan->nik ?? '-' }} &middot; {{ $item->karyawan->bagian ?? '-' }} &middot; {{ $item->tanggal_ambil?->translatedFormat('d F Y') ?? '-' }}
+                                        </div>
+                                    </div>
+                                    <div class="compact-trailing">
+                                        <span class="badge-status">{{ $item->karyawan->status ?? '-' }}</span>
+                                        <span class="compact-count">{{ $item->jumlah_gula ?? 0 }} Kg</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 @else
                     <div class="empty-state">
                         <i class="bi bi-inbox"></i>
-                        <div>Belum ada data pengambilan pada periode ini.</div>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-
-        {{-- =====================================================
-            PER STATUS KARYAWAN
-        ====================================================== --}}
-
-        <div class="card content-card section-gap">
-            <div class="card-header">
-                <div class="section-title">Pengambilan per Status Karyawan</div>
-            </div>
-            <div class="card-body">
-                @if($perStatus->count() > 0)
-                    <div class="table-wrapper">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th class="text-end">Jumlah Pengambilan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($perStatus as $item)
-                                    <tr>
-                                        <td><span class="badge-status">{{ $item['status'] }}</span></td>
-                                        <td class="text-end fw-semibold">{{ $item['total'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <div>Belum ada data pengambilan pada periode ini.</div>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-
-        {{-- =====================================================
-            PENGAMBILAN TERBARU
-        ====================================================== --}}
-
-        <div class="card content-card section-gap">
-            <div class="card-header">
-                <div class="section-title">Pengambilan Terbaru</div>
-            </div>
-            <div class="card-body">
-                @if($pengambilanTerbaru->count() > 0)
-                    <div class="table-wrapper">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>NIK</th>
-                                    <th>Nama</th>
-                                    <th>Bagian</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Jumlah</th>
-                                    <th>Tanggal Ambil</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($pengambilanTerbaru as $index => $item)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $item->karyawan->nik ?? '-' }}</td>
-                                        <td class="fw-semibold">{{ $item->karyawan->nama ?? '-' }}</td>
-                                        <td>{{ $item->karyawan->bagian ?? '-' }}</td>
-                                        <td><span class="badge-status">{{ $item->karyawan->status ?? '-' }}</span></td>
-                                        <td class="text-end fw-semibold">{{ $item->jumlah_gula ?? 0 }} KG</td>
-                                        <td>{{ $item->tanggal_ambil?->translatedFormat('d F Y') ?? '-' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <div>Belum ada data pengambilan.</div>
+                        <div>Belum ada data pengambilan pada rentang tanggal ini.</div>
                     </div>
                 @endif
             </div>
