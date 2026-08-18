@@ -18,13 +18,40 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
-        $laporan = $this->getLaporanQuery($request)->get();
+        /*
+        |--------------------------------------------------------------------------
+        | DATA TABEL — DIPAGINASI (15 per halaman)
+        |--------------------------------------------------------------------------
+        |
+        | withQueryString() supaya filter (tanggal, status, search)
+        | tetap terbawa saat pindah halaman.
+        |
+        */
+        $laporan = $this->getLaporanQuery($request)
+            ->paginate(15)
+            ->withQueryString();
 
         $statistik = $this->getStatistik($request);
 
+        /*
+        |--------------------------------------------------------------------------
+        | DAFTAR "BELUM MENGAMBIL" — TIDAK DIPAGINASI
+        |--------------------------------------------------------------------------
+        |
+        | Diambil terpisah dari query yang sama (tetap menghormati filter
+        | tanggal + search), tapi status dipaksa 'belum' dan TANPA paginate(),
+        | supaya daftar ini selalu menampilkan seluruh karyawan yang belum
+        | mengambil (bukan cuma yang ada di halaman aktif).
+        |
+        */
+        $belumRequest = clone $request;
+        $belumRequest->merge(['status' => 'belum']);
+
+        $belumMengambilAll = $this->getLaporanQuery($belumRequest)->get();
+
         return view(
             'admin.laporan.index',
-            compact('laporan', 'statistik')
+            compact('laporan', 'statistik', 'belumMengambilAll')
         );
     }
 
@@ -51,7 +78,6 @@ class LaporanController extends Controller
     public function exportPdf(Request $request)
     {
         $laporan = $this->getLaporanQuery($request)->get();
-
         $statistik = $this->getStatistik($request);
 
         $pdf = Pdf::loadView(
@@ -61,9 +87,7 @@ class LaporanController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        return $pdf->download(
-            'laporan-pengambilan-gula.pdf'
-        );
+        return $pdf->download('laporan-pengambilan-gula.pdf');
     }
 
 
@@ -75,7 +99,6 @@ class LaporanController extends Controller
     public function previewPdf(Request $request)
     {
         $laporan = $this->getLaporanQuery($request)->get();
-
         $statistik = $this->getStatistik($request);
 
         return view(
@@ -93,7 +116,6 @@ class LaporanController extends Controller
     public function downloadPdf(Request $request)
     {
         $laporan = $this->getLaporanQuery($request)->get();
-
         $statistik = $this->getStatistik($request);
 
         $pdf = Pdf::loadView(
@@ -103,9 +125,7 @@ class LaporanController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        return $pdf->download(
-            'laporan-pengambilan-gula.pdf'
-        );
+        return $pdf->download('laporan-pengambilan-gula.pdf');
     }
 
 
@@ -132,9 +152,6 @@ class LaporanController extends Controller
         |--------------------------------------------------------------------------
         | SUBQUERY PENGAMBILAN
         |--------------------------------------------------------------------------
-        |
-        | Hanya mengambil data berdasarkan periode yang dipilih.
-        |
         */
         $pengambilanQuery = DB::table('pengambilan_gula')
             ->select(
@@ -143,14 +160,8 @@ class LaporanController extends Controller
                 'jumlah_gula'
             );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTER TANGGAL AWAL
-        |--------------------------------------------------------------------------
-        */
+        // Filter tanggal awal
         if ($request->filled('tanggal_awal')) {
-
             $pengambilanQuery->whereDate(
                 'tanggal_ambil',
                 '>=',
@@ -158,14 +169,8 @@ class LaporanController extends Controller
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTER TANGGAL AKHIR
-        |--------------------------------------------------------------------------
-        */
+        // Filter tanggal akhir
         if ($request->filled('tanggal_akhir')) {
-
             $pengambilanQuery->whereDate(
                 'tanggal_ambil',
                 '<=',
@@ -173,15 +178,10 @@ class LaporanController extends Controller
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | QUERY UTAMA
         |--------------------------------------------------------------------------
-        |
-        | LEFT JOIN digunakan supaya karyawan yang belum mengambil
-        | tetap muncul.
-        |
         */
         $query = DB::table('karyawan')
             ->leftJoinSub(
@@ -202,24 +202,7 @@ class LaporanController extends Controller
                 'karyawan.kategori',
                 'karyawan.bagian',
                 'pengambilan.tanggal_ambil',
-
-                /*
-                |--------------------------------------------------------------------------
-                | JUMLAH GULA
-                |--------------------------------------------------------------------------
-                |
-                | Kalau belum mengambil -> 0 KG
-                |
-                */
-                DB::raw(
-                    'COALESCE(pengambilan.jumlah_gula, 0) as jumlah_gula'
-                ),
-
-                /*
-                |--------------------------------------------------------------------------
-                | STATUS PENGAMBILAN
-                |--------------------------------------------------------------------------
-                */
+                DB::raw('COALESCE(pengambilan.jumlah_gula, 0) as jumlah_gula'),
                 DB::raw(
                     "CASE
                         WHEN pengambilan.karyawan_id IS NOT NULL
@@ -229,6 +212,19 @@ class LaporanController extends Controller
                 )
             );
 
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER PENCARIAN (Nama / NIK)  ← BARU
+        |--------------------------------------------------------------------------
+        */
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('karyawan.nama', 'like', "%{$search}%")
+                  ->orWhere('karyawan.nik', 'like', "%{$search}%");
+            });
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -236,39 +232,19 @@ class LaporanController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($request->filled('status')) {
-
             if ($request->status === 'sudah') {
-
-                /*
-                | Hanya yang sudah mengambil
-                */
-                $query->whereNotNull(
-                    'pengambilan.karyawan_id'
-                );
-            }
-
-            elseif ($request->status === 'belum') {
-
-                /*
-                | Hanya yang belum mengambil
-                */
-                $query->whereNull(
-                    'pengambilan.karyawan_id'
-                );
+                $query->whereNotNull('pengambilan.karyawan_id');
+            } elseif ($request->status === 'belum') {
+                $query->whereNull('pengambilan.karyawan_id');
             }
         }
-
 
         /*
         |--------------------------------------------------------------------------
         | URUTKAN
         |--------------------------------------------------------------------------
         */
-        $query->orderBy(
-            'karyawan.nama',
-            'asc'
-        );
-
+        $query->orderBy('karyawan.nama', 'asc');
 
         return $query;
     }
@@ -278,36 +254,19 @@ class LaporanController extends Controller
      * =========================================================
      * STATISTIK LAPORAN
      * =========================================================
+     *
+     * Statistik tetap berbasis periode (tanggal) saja.
+     * Search tidak mempengaruhi angka di kartu statistik.
      */
     private function getStatistik(Request $request = null)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | TOTAL SELURUH KARYAWAN
-        |--------------------------------------------------------------------------
-        */
-        $totalKaryawan = DB::table('karyawan')
-            ->count();
+        // Total seluruh karyawan
+        $totalKaryawan = DB::table('karyawan')->count();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | QUERY PENGAMBILAN
-        |--------------------------------------------------------------------------
-        |
-        | Query ini hanya mengambil data pada periode yang dipilih.
-        |
-        */
+        // Query pengambilan (hanya filter tanggal)
         $pengambilanQuery = DB::table('pengambilan_gula');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTER TANGGAL AWAL
-        |--------------------------------------------------------------------------
-        */
         if ($request && $request->filled('tanggal_awal')) {
-
             $pengambilanQuery->whereDate(
                 'tanggal_ambil',
                 '>=',
@@ -315,14 +274,7 @@ class LaporanController extends Controller
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTER TANGGAL AKHIR
-        |--------------------------------------------------------------------------
-        */
         if ($request && $request->filled('tanggal_akhir')) {
-
             $pengambilanQuery->whereDate(
                 'tanggal_ambil',
                 '<=',
@@ -330,67 +282,30 @@ class LaporanController extends Controller
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUDAH MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
+        // Sudah mengambil
         $sudahAmbil = (clone $pengambilanQuery)
             ->distinct()
             ->count('karyawan_id');
 
+        // Belum mengambil
+        $belumAmbil = max(0, $totalKaryawan - $sudahAmbil);
 
-        /*
-        |--------------------------------------------------------------------------
-        | BELUM MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
-        $belumAmbil = max(
-            0,
-            $totalKaryawan - $sudahAmbil
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TOTAL GULA
-        |--------------------------------------------------------------------------
-        |
-        | Hanya menjumlahkan gula yang benar-benar diambil
-        | pada periode yang dipilih.
-        |
-        */
+        // Total gula
         $totalGula = (clone $pengambilanQuery)
             ->whereNotNull('jumlah_gula')
             ->sum('jumlah_gula');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PENSIUN
-        |--------------------------------------------------------------------------
-        */
+        // Pensiun (opsional, kalau masih dipakai)
         $pensiun = DB::table('karyawan')
             ->where('status', 'pensiun')
             ->count();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RETURN
-        |--------------------------------------------------------------------------
-        */
         return [
             'totalKaryawan' => $totalKaryawan,
-
-            'sudahAmbil' => $sudahAmbil,
-
-            'belumAmbil' => $belumAmbil,
-
-            'pensiun' => $pensiun,
-
-            'totalGula' => $totalGula,
+            'sudahAmbil'    => $sudahAmbil,
+            'belumAmbil'    => $belumAmbil,
+            'pensiun'       => $pensiun,
+            'totalGula'     => $totalGula,
         ];
     }
 }
