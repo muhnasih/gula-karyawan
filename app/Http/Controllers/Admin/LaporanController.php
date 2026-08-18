@@ -114,24 +114,33 @@ class LaporanController extends Controller
      * QUERY LAPORAN
      * =========================================================
      *
-     * Menampilkan data pengambilan gula sesuai filter tanggal.
+     * Menampilkan SEMUA karyawan.
+     *
+     * Jika karyawan sudah mengambil pada periode yang dipilih:
+     *     tanggal_ambil = tanggal pengambilan
+     *     jumlah_gula   = jumlah gula
+     *     status        = sudah
+     *
+     * Jika belum mengambil:
+     *     tanggal_ambil = null
+     *     jumlah_gula   = 0
+     *     status        = belum
      */
     private function getLaporanQuery(Request $request)
     {
-        $query = DB::table('pengambilan_gula')
-            ->join(
-                'karyawan',
-                'karyawan.id',
-                '=',
-                'pengambilan_gula.karyawan_id'
-            )
+        /*
+        |--------------------------------------------------------------------------
+        | SUBQUERY PENGAMBILAN
+        |--------------------------------------------------------------------------
+        |
+        | Hanya mengambil data berdasarkan periode yang dipilih.
+        |
+        */
+        $pengambilanQuery = DB::table('pengambilan_gula')
             ->select(
-                'karyawan.nik',
-                'karyawan.nama',
-                'karyawan.kategori',
-                'karyawan.bagian',
-                'pengambilan_gula.tanggal_ambil',
-                'pengambilan_gula.jumlah_gula'
+                'karyawan_id',
+                'tanggal_ambil',
+                'jumlah_gula'
             );
 
 
@@ -142,8 +151,8 @@ class LaporanController extends Controller
         */
         if ($request->filled('tanggal_awal')) {
 
-            $query->whereDate(
-                'pengambilan_gula.tanggal_ambil',
+            $pengambilanQuery->whereDate(
+                'tanggal_ambil',
                 '>=',
                 $request->tanggal_awal
             );
@@ -157,8 +166,8 @@ class LaporanController extends Controller
         */
         if ($request->filled('tanggal_akhir')) {
 
-            $query->whereDate(
-                'pengambilan_gula.tanggal_ambil',
+            $pengambilanQuery->whereDate(
+                'tanggal_ambil',
                 '<=',
                 $request->tanggal_akhir
             );
@@ -167,31 +176,92 @@ class LaporanController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTER STATUS
+        | QUERY UTAMA
         |--------------------------------------------------------------------------
         |
-        | Karena tabel pengambilan_gula hanya berisi data yang sudah mengambil,
-        | maka:
+        | LEFT JOIN digunakan supaya karyawan yang belum mengambil
+        | tetap muncul.
         |
-        | sudah = tampilkan data pengambilan
-        | belum = tidak ada data pengambilan
-        |
-        | Untuk sementara filter "belum" dikosongkan.
-        |
+        */
+        $query = DB::table('karyawan')
+            ->leftJoinSub(
+                $pengambilanQuery,
+                'pengambilan',
+                function ($join) {
+                    $join->on(
+                        'karyawan.id',
+                        '=',
+                        'pengambilan.karyawan_id'
+                    );
+                }
+            )
+            ->select(
+                'karyawan.id',
+                'karyawan.nik',
+                'karyawan.nama',
+                'karyawan.kategori',
+                'karyawan.bagian',
+                'pengambilan.tanggal_ambil',
+
+                /*
+                |--------------------------------------------------------------------------
+                | JUMLAH GULA
+                |--------------------------------------------------------------------------
+                |
+                | Kalau belum mengambil -> 0 KG
+                |
+                */
+                DB::raw(
+                    'COALESCE(pengambilan.jumlah_gula, 0) as jumlah_gula'
+                ),
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATUS PENGAMBILAN
+                |--------------------------------------------------------------------------
+                */
+                DB::raw(
+                    "CASE
+                        WHEN pengambilan.karyawan_id IS NOT NULL
+                        THEN 'sudah'
+                        ELSE 'belum'
+                    END as status_pengambilan"
+                )
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER STATUS
+        |--------------------------------------------------------------------------
         */
         if ($request->filled('status')) {
 
-            if ($request->status === 'belum') {
+            if ($request->status === 'sudah') {
 
-                // Tidak ada data pengambilan
-                $query->whereRaw('1 = 0');
+                /*
+                | Hanya yang sudah mengambil
+                */
+                $query->whereNotNull(
+                    'pengambilan.karyawan_id'
+                );
+            }
+
+            elseif ($request->status === 'belum') {
+
+                /*
+                | Hanya yang belum mengambil
+                */
+                $query->whereNull(
+                    'pengambilan.karyawan_id'
+                );
             }
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | URUTKAN BERDASARKAN NAMA
+        | URUTKAN
         |--------------------------------------------------------------------------
         */
         $query->orderBy(
@@ -222,8 +292,11 @@ class LaporanController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | QUERY PENGAMBILAN BERDASARKAN PERIODE
+        | QUERY PENGAMBILAN
         |--------------------------------------------------------------------------
+        |
+        | Query ini hanya mengambil data pada periode yang dipilih.
+        |
         */
         $pengambilanQuery = DB::table('pengambilan_gula');
 
@@ -260,14 +333,11 @@ class LaporanController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | JUMLAH KARYAWAN YANG SUDAH MENGAMBIL
+        | SUDAH MENGAMBIL
         |--------------------------------------------------------------------------
-        |
-        | DISTINCT agar satu karyawan tidak dihitung dua kali.
-        |
         */
         $sudahAmbil = (clone $pengambilanQuery)
-            ->distinct('karyawan_id')
+            ->distinct()
             ->count('karyawan_id');
 
 
@@ -287,15 +357,8 @@ class LaporanController extends Controller
         | TOTAL GULA
         |--------------------------------------------------------------------------
         |
-        | INI BAGIAN YANG DIPERBAIKI.
-        |
-        | Sekarang total gula mengikuti filter tanggal.
-        |
-        | Contoh:
-        |
-        | 01-07-2026 s/d 30-07-2026
-        |
-        | Maka hanya jumlah_gula pada periode tersebut yang dijumlahkan.
+        | Hanya menjumlahkan gula yang benar-benar diambil
+        | pada periode yang dipilih.
         |
         */
         $totalGula = (clone $pengambilanQuery)
@@ -315,7 +378,7 @@ class LaporanController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RETURN STATISTIK
+        | RETURN
         |--------------------------------------------------------------------------
         */
         return [

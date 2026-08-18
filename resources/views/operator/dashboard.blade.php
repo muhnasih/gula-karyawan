@@ -12,6 +12,8 @@
     .operator-card { border: 0; border-radius: 16px; overflow: hidden; }
     .operator-card .card-body { padding: 1.25rem; }
     .card-title-operator { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+
+    /* Scanner */
     .scanner-wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
     #reader { width: 100% !important; max-width: 520px; margin: 0 auto; overflow: hidden; border-radius: 14px; }
     #reader video { width: 100% !important; height: auto !important; max-height: 430px; object-fit: cover; border-radius: 12px; }
@@ -24,6 +26,8 @@
     #reader__camera_permission_button { width: 100%; max-width: 100%; }
     #reader__dashboard_section_swaplink { display: inline-block; margin-top: 6px; }
     #scan-status { border-radius: 10px; font-size: .9rem; line-height: 1.4; }
+
+    /* Hasil Scan */
     #hasil-scan { border-radius: 16px; }
     .employee-info { background: #f8f9fa; border-radius: 12px; padding: 1rem; }
     .employee-item { min-height: 58px; }
@@ -36,13 +40,168 @@
     .sugar-category { font-size: .85rem; margin-top: .35rem; opacity: .95; }
     #status-box { border-radius: 10px; margin-bottom: 1rem; line-height: 1.5; }
     #form-confirm .btn, #scan-lagi { min-height: 46px; border-radius: 10px; font-weight: 600; }
-    .history-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    #tabel-riwayat { width: 100%; min-width: 520px; margin-bottom: 0; }
-    #tabel-riwayat th { font-size: .75rem; font-weight: 700; color: #6c757d; white-space: nowrap; text-transform: uppercase; }
-    #tabel-riwayat td { font-size: .85rem; vertical-align: middle; }
-    #tabel-riwayat td:first-child { white-space: nowrap; }
-    .history-empty { padding: 1.5rem .5rem !important; }
-    .badge-kg { display: inline-flex; align-items: center; gap: .2rem; font-size: .75rem; font-weight: 700; padding: .4rem .6rem; border-radius: 8px; }
+
+    /* =========================================================
+       RIWAYAT - MODERN LIST
+    ========================================================= */
+    .history-list {
+        border: 1px solid #edf0f4;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .history-list-scroll {
+        max-height: 520px;
+        overflow-y: auto;
+    }
+
+    .history-list-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .history-list-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .history-list-scroll::-webkit-scrollbar-thumb {
+        background: #d9dee6;
+        border-radius: 10px;
+    }
+
+    .history-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-bottom: 1px solid #f0f2f5;
+        transition: background .15s ease;
+    }
+
+    .history-item:last-child {
+        border-bottom: 0;
+    }
+
+    .history-item:hover {
+        background: #fafbfd;
+    }
+
+    .history-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf9f2;
+        color: #198754;
+        font-size: .8rem;
+        font-weight: 800;
+    }
+
+    .history-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .history-name {
+        color: #1e293b;
+        font-size: .85rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .history-meta {
+        margin-top: 3px;
+        color: #94a3b8;
+        font-size: .72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .history-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    .history-kg {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 7px;
+        background: #edf9f2;
+        color: #198754;
+        font-size: .68rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .history-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 7px;
+        border-radius: 6px;
+        background: #edf9f2;
+        color: #198754;
+        font-size: .62rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .history-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    /* Empty State */
+    .history-empty-state {
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px 20px;
+    }
+
+    .history-empty-icon {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+        color: #94a3b8;
+        font-size: 1.4rem;
+    }
+
+    .history-empty-title {
+        color: #64748b;
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .history-empty-desc {
+        margin-top: 4px;
+        color: #94a3b8;
+        font-size: .72rem;
+    }
+
+    /* Responsive */
     @media (max-width: 767.98px) {
         .operator-dashboard { padding-left: 0; padding-right: 0; }
         .operator-header { margin-bottom: 1rem; }
@@ -62,8 +221,14 @@
         .sugar-card { padding: .9rem; }
         .sugar-value { font-size: 1.6rem; }
         #form-confirm .btn, #scan-lagi { min-height: 48px; font-size: .9rem; }
-        #tabel-riwayat { min-width: 500px; }
+
+        .history-list-scroll { max-height: 380px; }
+        .history-item { padding: 11px 12px; gap: 10px; }
+        .history-avatar { width: 36px; height: 36px; min-width: 36px; font-size: .75rem; }
+        .history-name { font-size: .8rem; }
+        .history-meta { font-size: .68rem; }
     }
+
     @media (max-width: 400px) {
         .operator-header h2 { font-size: 1.2rem; }
         .operator-header p { font-size: .78rem; }
@@ -71,11 +236,15 @@
         #reader video { max-height: 300px; }
         #scan-status { font-size: .78rem; }
         .sugar-value { font-size: 1.45rem; }
+        .history-item { padding: 10px; }
+        .history-avatar { width: 34px; height: 34px; min-width: 34px; }
     }
+
     @media (min-width: 768px) and (max-width: 991.98px) {
         .operator-card .card-body { padding: 1rem; }
         #reader video { max-height: 380px; }
     }
+
     .scan-result-animation { animation: scanResult .25s ease-out; }
     @keyframes scanResult { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -106,6 +275,7 @@
 
     <div class="row g-3">
 
+        {{-- KIRI: SCANNER + HASIL --}}
         <div class="col-12 col-lg-7">
 
             <div class="card shadow-sm operator-card mb-3">
@@ -134,49 +304,42 @@
 
                     <div class="employee-info">
                         <div class="row g-3">
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">Nama</span>
                                     <div id="nama" class="employee-value">-</div>
                                 </div>
                             </div>
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">NIK</span>
                                     <div id="nik" class="employee-value">-</div>
                                 </div>
                             </div>
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">Jabatan</span>
                                     <div id="jabatan" class="employee-value">-</div>
                                 </div>
                             </div>
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">Bagian</span>
                                     <div id="bagian" class="employee-value">-</div>
                                 </div>
                             </div>
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">Kategori</span>
                                     <div id="kategori" class="employee-value">-</div>
                                 </div>
                             </div>
-
                             <div class="col-12 col-sm-6">
                                 <div class="employee-item">
                                     <span class="employee-label">Status</span>
                                     <div id="status-karyawan" class="employee-value">-</div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -212,6 +375,7 @@
 
         </div>
 
+        {{-- KANAN: RIWAYAT --}}
         <div class="col-12 col-lg-5">
             <div class="card shadow-sm operator-card">
                 <div class="card-body">
@@ -221,43 +385,51 @@
                         Riwayat Pengambilan
                     </div>
 
-                    <div class="history-wrapper">
-                        <table class="table table-sm align-middle" id="tabel-riwayat">
-                            <thead>
-                                <tr>
-                                    <th>NIK</th>
-                                    <th>Nama</th>
-                                    <th>Status</th>
-                                    <th>Jumlah</th>
-                                    <th>Tanggal</th>
-                                    <th>Pengambilan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($riwayat ?? [] as $item)
-                                    <tr>
-                                        <td>{{ $item->nik }}</td>
-                                        <td>{{ $item->nama }}</td>
-                                        <td>{{ $item->status ?? '-' }}</td>
-                                        <td>
-                                            <span class="badge bg-success badge-kg">
-                                                <i class="bi bi-box-seam"></i>
-                                                {{ $item->jumlah_gula ?? 0 }} KG
-                                            </span>
-                                        </td>
-                                        <td>{{ $item->tanggal_ambil }}</td>
-                                        <td><span class="badge bg-success">SUDAH</span></td>
-                                    </tr>
-                                @empty
-                                    <tr id="riwayat-kosong">
-                                        <td colspan="6" class="text-center text-muted history-empty">
-                                            <i class="bi bi-inbox fs-4 d-block mb-1"></i>
-                                            Belum ada data
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div class="history-list">
+                        <div class="history-list-scroll" id="riwayat-container">
+
+                            @forelse($riwayat ?? [] as $item)
+                                <div class="history-item">
+                                    <div class="history-avatar">
+                                        {{ strtoupper(substr($item->nama ?? 'K', 0, 1)) }}
+                                    </div>
+
+                                    <div class="history-content">
+                                        <div class="history-name">
+                                            {{ $item->nama ?? '-' }}
+                                        </div>
+                                        <div class="history-meta">
+                                            {{ $item->nik ?? '-' }}
+                                            &nbsp;•&nbsp;
+                                            {{ $item->status ?? '-' }}
+                                            &nbsp;•&nbsp;
+                                            {{ $item->tanggal_ambil ?? '-' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="history-right">
+                                        <span class="history-kg">
+                                            <i class="bi bi-box-seam"></i>
+                                            {{ $item->jumlah_gula ?? 0 }} KG
+                                        </span>
+                                        <span class="history-status">
+                                            SUDAH
+                                        </span>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="history-empty-state" id="riwayat-kosong">
+                                    <div class="history-empty-icon">
+                                        <i class="bi bi-inbox"></i>
+                                    </div>
+                                    <div class="history-empty-title">Belum ada data</div>
+                                    <div class="history-empty-desc">
+                                        Riwayat pengambilan akan muncul di sini setelah scan berhasil.
+                                    </div>
+                                </div>
+                            @endforelse
+
+                        </div>
                     </div>
 
                 </div>
@@ -271,14 +443,12 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-
     let scanner = null;
     let sedangScan = true;
 
-    function mulaiScanner()
-    {
+    function mulaiScanner() {
         const reader = document.getElementById('reader');
-        if (!reader) { return; }
+        if (!reader) return;
 
         scanner = new Html5Qrcode("reader");
 
@@ -296,12 +466,12 @@
                 disableFlip: false
             },
             function(decodedText) {
-                if (!sedangScan) { return; }
+                if (!sedangScan) return;
                 sedangScan = false;
                 prosesScan(decodedText);
             },
             function(errorMessage) {
-                // Error scanner tidak perlu ditampilkan.
+                // ignore
             }
         )
         .catch(function(error) {
@@ -314,8 +484,7 @@
         });
     }
 
-    function prosesScan(nik)
-    {
+    function prosesScan(nik) {
         const status = document.getElementById('scan-status');
         status.className = 'alert alert-warning mt-3 mb-0';
         status.innerHTML =
@@ -352,8 +521,7 @@
         });
     }
 
-    function tampilkanData(data)
-    {
+    function tampilkanData(data) {
         const karyawan = data.karyawan;
 
         const hasilScan = document.getElementById('hasil-scan');
@@ -378,8 +546,7 @@
         const statusBox = document.getElementById('status-box');
         const formConfirm = document.getElementById('form-confirm');
 
-        if (data.status === 'belum')
-        {
+        if (data.status === 'belum') {
             statusBox.className = 'alert alert-warning';
             statusBox.innerHTML =
                 '<i class="bi bi-exclamation-circle-fill me-1"></i>' +
@@ -388,9 +555,7 @@
                 '<strong>Jatah: ' + (data.jumlah_gula ?? '-') + ' KG</strong>';
 
             formConfirm.classList.remove('d-none');
-        }
-        else
-        {
+        } else {
             statusBox.className = 'alert alert-success';
             statusBox.innerHTML =
                 '<i class="bi bi-check-circle-fill me-1"></i>' +
@@ -407,28 +572,44 @@
         scanStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>QR berhasil dibaca.';
     }
 
-    function tambahRiwayat(nik, nama, status, jumlahGula, tanggal)
-    {
+    // Fungsi tambah riwayat (sudah disesuaikan dengan layout baru)
+    function tambahRiwayat(nik, nama, status, jumlahGula, tanggal) {
         const kosong = document.getElementById('riwayat-kosong');
-        if (kosong) { kosong.remove(); }
+        if (kosong) kosong.remove();
 
-        const tbody = document.querySelector('#tabel-riwayat tbody');
-        const row = document.createElement('tr');
+        const container = document.getElementById('riwayat-container');
+        if (!container) return;
 
-        row.innerHTML =
-            '<td>' + escapeHtml(nik) + '</td>' +
-            '<td>' + escapeHtml(nama) + '</td>' +
-            '<td>' + escapeHtml(status || '-') + '</td>' +
-            '<td><span class="badge bg-success badge-kg"><i class="bi bi-box-seam"></i>' + escapeHtml(jumlahGula || 0) + ' KG</span></td>' +
-            '<td>' + escapeHtml(tanggal || '-') + '</td>' +
-            '<td><span class="badge bg-success">SUDAH</span></td>';
+        const initial = (nama || 'K').charAt(0).toUpperCase();
 
-        tbody.prepend(row);
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+            <div class="history-avatar">${escapeHtml(initial)}</div>
+            <div class="history-content">
+                <div class="history-name">${escapeHtml(nama || '-')}</div>
+                <div class="history-meta">
+                    ${escapeHtml(nik || '-')}
+                    &nbsp;•&nbsp;
+                    ${escapeHtml(status || '-')}
+                    &nbsp;•&nbsp;
+                    ${escapeHtml(tanggal || '-')}
+                </div>
+            </div>
+            <div class="history-right">
+                <span class="history-kg">
+                    <i class="bi bi-box-seam"></i>
+                    ${escapeHtml(jumlahGula || 0)} KG
+                </span>
+                <span class="history-status">SUDAH</span>
+            </div>
+        `;
+
+        container.prepend(item);
     }
 
-    function escapeHtml(value)
-    {
-        if (value === null || value === undefined) { return ''; }
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
         return String(value)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -437,8 +618,7 @@
             .replace(/'/g, '&#039;');
     }
 
-    document.getElementById('form-confirm').addEventListener('submit', function(e)
-    {
+    document.getElementById('form-confirm').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const form = this;
@@ -493,8 +673,7 @@
         });
     });
 
-    function scanLagi()
-    {
+    function scanLagi() {
         document.getElementById('hasil-scan').classList.add('d-none');
         document.getElementById('form-confirm').classList.add('d-none');
 
@@ -506,7 +685,6 @@
     }
 
     mulaiScanner();
-
 </script>
 
 @endsection

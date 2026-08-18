@@ -6,7 +6,7 @@
 
 <style>
     /* =========================================================
-       OPERATOR STATISTIK - CLEAN MODERN
+       OPERATOR STATISTIK - CLEAN MODERN (Improved)
     ========================================================= */
 
     .operator-statistik {
@@ -278,7 +278,7 @@
 
     .filter-form {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) auto auto;
         gap: 10px;
         align-items: end;
     }
@@ -320,10 +320,33 @@
         font-weight: 700;
         transition: .2s ease;
         white-space: nowrap;
+        cursor: pointer;
     }
 
     .filter-button:hover {
         background: #0b5ed7;
+    }
+
+    .filter-button-reset {
+        height: 40px;
+        padding: 0 14px;
+        border: 1px solid #dfe5ec;
+        border-radius: 9px;
+        background: #fff;
+        color: #5a6577;
+        font-size: .76rem;
+        font-weight: 700;
+        transition: .2s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-button-reset:hover {
+        background: #f4f6f9;
+        color: #3d495b;
     }
 
     /* =========================================================
@@ -371,7 +394,7 @@
     }
 
     .data-list-scroll {
-        max-height: 360px;
+        max-height: 420px;
         overflow-y: auto;
     }
 
@@ -561,11 +584,18 @@
     ========================================================= */
 
     @media (max-width: 1000px) {
-
         .statistics-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
+        .filter-form {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .filter-submit,
+        .filter-reset {
+            grid-column: span 1;
+        }
     }
 
     /* =========================================================
@@ -573,7 +603,6 @@
     ========================================================= */
 
     @media (max-width: 650px) {
-
         .operator-statistik .dashboard-container {
             padding: 18px 12px 28px;
         }
@@ -641,19 +670,31 @@
 
         .filter-form {
             grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
 
-        .filter-submit {
+        .filter-group-search {
             grid-column: 1 / -1;
         }
 
-        .filter-button {
+        .filter-submit,
+        .filter-reset {
+            grid-column: span 1;
+        }
+
+        .filter-button,
+        .filter-button-reset {
             width: 100%;
         }
 
         .result-summary {
             align-items: flex-start;
             flex-direction: column;
+            gap: 8px;
+        }
+
+        .data-list-scroll {
+            max-height: 380px;
         }
 
         .data-item {
@@ -683,18 +724,59 @@
             font-size: .59rem;
         }
 
+        /* Status badge tetap muncul, hanya diperkecil */
         .status-badge {
-            display: none;
+            font-size: .55rem;
+            padding: 4px 6px;
+            gap: 4px;
         }
 
+        .status-badge::before {
+            width: 4px;
+            height: 4px;
+        }
+
+        .kg-badge {
+            font-size: .55rem;
+            padding: 4px 6px;
+        }
     }
 
     /* =========================================================
        SMALL MOBILE
     ========================================================= */
 
-    @media (max-width: 390px) {
+    @media (max-width: 480px) {
+        .statistics-grid {
+            gap: 8px;
+        }
 
+        .stat-card {
+            padding: 12px 10px;
+        }
+
+        .stat-number {
+            font-size: 1.15rem;
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-group-search,
+        .filter-submit,
+        .filter-reset {
+            grid-column: auto;
+        }
+
+        .data-right {
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+    }
+
+    @media (max-width: 390px) {
         .operator-statistik .dashboard-container {
             padding-left: 10px;
             padding-right: 10px;
@@ -713,7 +795,7 @@
         }
 
         .stat-number {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
         }
 
         .stat-icon {
@@ -723,19 +805,9 @@
             font-size: .8rem;
         }
 
-        .filter-form {
-            grid-template-columns: 1fr;
+        .data-list-scroll {
+            max-height: 340px;
         }
-
-        .filter-submit {
-            grid-column: auto;
-        }
-
-        .data-right .kg-badge {
-            font-size: .55rem;
-            padding: 4px 6px;
-        }
-
     }
 </style>
 
@@ -751,28 +823,21 @@
         <div class="dashboard-header">
 
             <div>
-
                 <h1 class="header-title">
                     Statistik Operator
                 </h1>
 
                 <p class="header-description">
                     Monitoring pengambilan gula periode
-
                     <strong>
                         {{ \Carbon\Carbon::createFromFormat('Y-m', $periode)->translatedFormat('F Y') }}
                     </strong>
                 </p>
-
             </div>
 
-
             <div class="header-period">
-
                 <i class="bi bi-calendar3"></i>
-
                 {{ \Carbon\Carbon::createFromFormat('Y-m', $periode)->translatedFormat('F Y') }}
-
             </div>
 
         </div>
@@ -784,118 +849,65 @@
 
         <div class="statistics-grid">
 
-
             {{-- TOTAL KARYAWAN --}}
-
             <div class="stat-card">
-
                 <div class="stat-card-content">
-
                     <div>
-
-                        <span class="stat-label">
-                            Total Karyawan
-                        </span>
-
+                        <span class="stat-label">Total Karyawan</span>
                         <div class="stat-number">
                             {{ number_format($statistik['total_karyawan'] ?? 0) }}
                         </div>
-
                     </div>
-
                     <div class="stat-icon blue">
                         <i class="bi bi-people-fill"></i>
                     </div>
-
                 </div>
-
             </div>
 
-
             {{-- SUDAH MENGAMBIL --}}
-
             <div class="stat-card">
-
                 <div class="stat-card-content">
-
                     <div>
-
-                        <span class="stat-label">
-                            Sudah Mengambil
-                        </span>
-
+                        <span class="stat-label">Sudah Mengambil</span>
                         <div class="stat-number">
                             {{ number_format($statistik['sudah_ambil'] ?? 0) }}
                         </div>
-
                     </div>
-
                     <div class="stat-icon green">
                         <i class="bi bi-check2-circle"></i>
                     </div>
-
                 </div>
-
             </div>
 
-
             {{-- BELUM MENGAMBIL --}}
-
             <div class="stat-card">
-
                 <div class="stat-card-content">
-
                     <div>
-
-                        <span class="stat-label">
-                            Belum Mengambil
-                        </span>
-
+                        <span class="stat-label">Belum Mengambil</span>
                         <div class="stat-number">
                             {{ number_format($statistik['belum_ambil'] ?? 0) }}
                         </div>
-
                     </div>
-
                     <div class="stat-icon orange">
                         <i class="bi bi-clock-history"></i>
                     </div>
-
                 </div>
-
             </div>
 
-
             {{-- TOTAL GULA --}}
-
             <div class="stat-card">
-
                 <div class="stat-card-content">
-
                     <div>
-
-                        <span class="stat-label">
-                            Total Gula Diambil
-                        </span>
-
+                        <span class="stat-label">Total Gula Diambil</span>
                         <div class="stat-number">
-
                             {{ number_format($statistik['total_kg'] ?? 0, 0, ',', '.') }}
-
-                            <span class="stat-unit">
-                                Kg
-                            </span>
-
+                            <span class="stat-unit">Kg</span>
                         </div>
-
                     </div>
-
                     <div class="stat-icon purple">
                         <i class="bi bi-box-seam-fill"></i>
                     </div>
-
                 </div>
-
             </div>
 
         </div>
@@ -908,63 +920,49 @@
         <div class="dashboard-card">
 
             <div class="dashboard-card-header">
-
                 <div class="card-title-wrapper">
-
                     <div class="card-icon">
                         <i class="bi bi-person-check-fill"></i>
                     </div>
-
                     <div>
-
-                        <h2 class="card-title">
-                            Sudah Mengambil
-                        </h2>
-
-                        <p class="card-subtitle">
-                            Daftar karyawan yang sudah mengambil gula
-                        </p>
-
+                        <h2 class="card-title">Sudah Mengambil</h2>
+                        <p class="card-subtitle">Daftar karyawan yang sudah mengambil gula</p>
                     </div>
-
                 </div>
 
-
                 @if($daftarSudahAmbil->count() > 0)
-
                     <div class="count-badge blue">
-
                         <i class="bi bi-people"></i>
-
                         {{ $daftarSudahAmbil->count() }} orang
-
                     </div>
-
                 @endif
-
             </div>
-
 
             <div class="dashboard-card-body">
 
-
                 {{-- FILTER --}}
-
                 <div class="filter-box">
-
                     <form method="GET"
                           action="{{ route('operator.statistik') }}"
                           class="filter-form">
 
+                        {{-- PENCARIAN --}}
+                        <div class="filter-group filter-group-search">
+                            <label for="search">Cari Nama / NIK</label>
+                            <input
+                                type="text"
+                                id="search"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="filter-control"
+                                placeholder="Ketik nama atau NIK..."
+                                autocomplete="off"
+                            >
+                        </div>
 
                         {{-- TANGGAL AWAL --}}
-
                         <div class="filter-group">
-
-                            <label for="tanggal_awal">
-                                Dari Tanggal
-                            </label>
-
+                            <label for="tanggal_awal">Dari Tanggal</label>
                             <input
                                 type="date"
                                 id="tanggal_awal"
@@ -972,18 +970,11 @@
                                 value="{{ $tanggalAwal ?? '' }}"
                                 class="filter-control"
                             >
-
                         </div>
 
-
                         {{-- TANGGAL AKHIR --}}
-
                         <div class="filter-group">
-
-                            <label for="tanggal_akhir">
-                                Sampai Tanggal
-                            </label>
-
+                            <label for="tanggal_akhir">Sampai Tanggal</label>
                             <input
                                 type="date"
                                 id="tanggal_akhir"
@@ -991,189 +982,104 @@
                                 value="{{ $tanggalAkhir ?? '' }}"
                                 class="filter-control"
                             >
-
                         </div>
 
-
-                        {{-- BUTTON --}}
-
+                        {{-- BUTTON FILTER --}}
                         <div class="filter-submit">
-
-                            <button type="submit"
-                                    class="filter-button">
-
+                            <button type="submit" class="filter-button">
                                 <i class="bi bi-search me-1"></i>
-
                                 Filter
-
                             </button>
+                        </div>
 
+                        {{-- BUTTON RESET --}}
+                        <div class="filter-reset">
+                            <a href="{{ route('operator.statistik') }}"
+                               class="filter-button-reset">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Reset
+                            </a>
                         </div>
 
                     </form>
-
                 </div>
 
 
-                {{-- =================================================
-                     RINGKASAN HASIL
-                ================================================== --}}
-
+                {{-- RINGKASAN HASIL --}}
                 @if($daftarSudahAmbil->count() > 0)
-
                     <div class="result-summary">
-
                         <div class="result-text">
-
                             Menampilkan
-
-                            <strong>
-                                {{ $daftarSudahAmbil->count() }}
-                            </strong>
-
+                            <strong>{{ $daftarSudahAmbil->count() }}</strong>
                             data pengambilan
-
                         </div>
-
 
                         <div class="kg-summary">
-
                             <i class="bi bi-box-seam"></i>
-
                             Total
-
                             {{ number_format($totalGulaSudahAmbil ?? 0, 0, ',', '.') }}
-
                             Kg
-
                         </div>
-
                     </div>
-
                 @endif
 
 
-                {{-- =================================================
-                     LIST SUDAH MENGAMBIL
-                ================================================== --}}
-
+                {{-- LIST SUDAH MENGAMBIL --}}
                 @if($daftarSudahAmbil->count() > 0)
-
                     <div class="data-list">
-
                         <div class="data-list-scroll">
-
                             @foreach($daftarSudahAmbil as $index => $item)
-
                                 <div class="data-item">
-
-
-                                    {{-- NOMOR --}}
 
                                     <div class="data-number">
                                         {{ $index + 1 }}
                                     </div>
 
-
-                                    {{-- AVATAR --}}
-
                                     <div class="data-avatar">
-
-                                        {{ strtoupper(
-                                            substr(
-                                                $item->karyawan->nama ?? 'K',
-                                                0,
-                                                1
-                                            )
-                                        ) }}
-
+                                        {{ strtoupper(substr($item->karyawan->nama ?? 'K', 0, 1)) }}
                                     </div>
-
-
-                                    {{-- INFORMASI --}}
 
                                     <div class="data-content">
-
                                         <div class="data-name">
-
                                             {{ $item->karyawan->nama ?? '-' }}
-
                                         </div>
-
-
                                         <div class="data-meta">
-
                                             {{ $item->karyawan->nik ?? '-' }}
-
                                             &nbsp;•&nbsp;
-
                                             {{ $item->karyawan->bagian ?? '-' }}
-
                                             &nbsp;•&nbsp;
-
-                                            {{ $item->tanggal_ambil?->translatedFormat('d F Y') ?? '-' }}
-
+                                            {{ $item->tanggal_ambil?->translatedFormat('d M Y') ?? '-' }}
                                         </div>
-
                                     </div>
 
-
-                                    {{-- STATUS + KG --}}
-
                                     <div class="data-right">
-
                                         <span class="status-badge">
-
                                             {{ $item->karyawan->status ?? '-' }}
-
                                         </span>
-
-
                                         <span class="kg-badge">
-
-                                            {{ $item->jumlah_gula ?? 0 }}
-
-                                            Kg
-
+                                            {{ $item->jumlah_gula ?? 0 }} Kg
                                         </span>
-
                                     </div>
 
                                 </div>
-
                             @endforeach
-
                         </div>
-
                     </div>
-
                 @else
-
-
-                    {{-- EMPTY --}}
-
                     <div class="empty-state">
-
                         <div class="empty-icon">
-
                             <i class="bi bi-inbox"></i>
-
                         </div>
-
                         <div class="empty-title">
                             Belum ada data pengambilan
                         </div>
-
                         <div class="empty-description">
-                            Tidak ditemukan data pada rentang tanggal yang dipilih.
+                            Tidak ditemukan data pada rentang tanggal / pencarian yang dipilih.
                         </div>
-
                     </div>
-
                 @endif
 
             </div>
-
         </div>
 
 
@@ -1184,161 +1090,79 @@
         <div class="dashboard-card">
 
             <div class="dashboard-card-header">
-
                 <div class="card-title-wrapper">
-
                     <div class="card-icon warning">
-
                         <i class="bi bi-person-exclamation"></i>
-
                     </div>
-
                     <div>
-
-                        <h2 class="card-title">
-                            Karyawan Belum Mengambil
-                        </h2>
-
-                        <p class="card-subtitle">
-                            Karyawan yang belum mengambil jatah gula
-                        </p>
-
+                        <h2 class="card-title">Karyawan Belum Mengambil</h2>
+                        <p class="card-subtitle">Karyawan yang belum mengambil jatah gula</p>
                     </div>
-
                 </div>
 
-
                 @if($karyawanBelumAmbil->count() > 0)
-
                     <div class="count-badge">
-
                         <i class="bi bi-clock"></i>
-
-                        {{ $karyawanBelumAmbil->count() }}
-
-                        orang
-
+                        {{ $karyawanBelumAmbil->count() }} orang
                     </div>
-
                 @endif
-
             </div>
-
 
             <div class="dashboard-card-body">
 
                 @if($karyawanBelumAmbil->count() > 0)
-
                     <div class="data-list">
-
                         <div class="data-list-scroll">
-
                             @foreach($karyawanBelumAmbil as $index => $karyawan)
-
                                 <div class="data-item">
-
-
-                                    {{-- NOMOR --}}
 
                                     <div class="data-number">
                                         {{ $index + 1 }}
                                     </div>
 
-
-                                    {{-- AVATAR --}}
-
                                     <div class="data-avatar warning">
-
-                                        {{ strtoupper(
-                                            substr(
-                                                $karyawan->nama ?? 'K',
-                                                0,
-                                                1
-                                            )
-                                        ) }}
-
+                                        {{ strtoupper(substr($karyawan->nama ?? 'K', 0, 1)) }}
                                     </div>
-
-
-                                    {{-- INFORMASI --}}
 
                                     <div class="data-content">
-
                                         <div class="data-name">
-
                                             {{ $karyawan->nama ?? '-' }}
-
                                         </div>
-
-
                                         <div class="data-meta">
-
                                             {{ $karyawan->nik ?? '-' }}
-
                                             &nbsp;•&nbsp;
-
                                             {{ $karyawan->bagian ?? '-' }}
-
                                         </div>
-
                                     </div>
 
-
-                                    {{-- STATUS --}}
-
                                     <div class="data-right">
-
                                         <span class="status-badge warning">
-
                                             Belum Mengambil
-
                                         </span>
-
                                     </div>
 
                                 </div>
-
                             @endforeach
-
                         </div>
-
                     </div>
-
                 @else
-
-
-                    {{-- SEMUA SUDAH MENGAMBIL --}}
-
                     <div class="empty-state">
-
                         <div class="empty-icon success">
-
                             <i class="bi bi-check-circle-fill"></i>
-
                         </div>
-
                         <div class="empty-title">
-
                             Semua karyawan sudah mengambil
-
                         </div>
-
                         <div class="empty-description">
-
                             Tidak ada karyawan yang masih menunggu pengambilan gula.
-
                         </div>
-
                     </div>
-
                 @endif
 
             </div>
-
         </div>
 
     </div>
-
 </div>
 
 @endsection
