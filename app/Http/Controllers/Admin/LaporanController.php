@@ -26,6 +26,12 @@ class LaporanController extends Controller
         | withQueryString() supaya filter (tanggal, status, search)
         | tetap terbawa saat pindah halaman.
         |
+        | Daftar "belum mengambil" TIDAK lagi diambil terpisah di sini.
+        | Kalau user ingin melihat seluruh karyawan yang belum mengambil,
+        | cukup gunakan filter Status = "Belum Mengambil" pada form filter
+        | di atas tabel — hasilnya tetap dipaginasi dan konsisten dengan
+        | tabel utama.
+        |
         */
         $laporan = $this->getLaporanQuery($request)
             ->paginate(15)
@@ -33,25 +39,9 @@ class LaporanController extends Controller
 
         $statistik = $this->getStatistik($request);
 
-        /*
-        |--------------------------------------------------------------------------
-        | DAFTAR "BELUM MENGAMBIL" — TIDAK DIPAGINASI
-        |--------------------------------------------------------------------------
-        |
-        | Diambil terpisah dari query yang sama (tetap menghormati filter
-        | tanggal + search), tapi status dipaksa 'belum' dan TANPA paginate(),
-        | supaya daftar ini selalu menampilkan seluruh karyawan yang belum
-        | mengambil (bukan cuma yang ada di halaman aktif).
-        |
-        */
-        $belumRequest = clone $request;
-        $belumRequest->merge(['status' => 'belum']);
-
-        $belumMengambilAll = $this->getLaporanQuery($belumRequest)->get();
-
         return view(
             'admin.laporan.index',
-            compact('laporan', 'statistik', 'belumMengambilAll')
+            compact('laporan', 'statistik')
         );
     }
 
@@ -214,7 +204,7 @@ class LaporanController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTER PENCARIAN (Nama / NIK)  ← BARU
+        | FILTER PENCARIAN (Nama / NIK)
         |--------------------------------------------------------------------------
         */
         if ($request->filled('search')) {
