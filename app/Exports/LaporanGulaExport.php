@@ -18,42 +18,104 @@ class LaporanGulaExport implements
 {
     protected $request;
 
+    protected int $bulanAktif;
+
+    protected int $tahunAktif;
+
     public function __construct(Request $request)
     {
         $this->request = $request;
+
+        // Default ke bulan & tahun berjalan, sama seperti halaman laporan.
+        $this->bulanAktif = (int) $request->input('bulan', now()->month);
+        $this->tahunAktif = (int) $request->input('tahun', now()->year);
     }
 
     public function collection()
     {
-        $query = DB::table('pengambilan_gula')
-            ->join(
-                'karyawan',
-                'karyawan.id',
-                '=',
-                'pengambilan_gula.karyawan_id'
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY PENGAMBILAN — DIBATASI KE BULAN & TAHUN AKTIF
+        |--------------------------------------------------------------------------
+        */
+
+        $pengambilanQuery = DB::table('pengambilan_gula')
+            ->select(
+                'karyawan_id',
+                'tanggal_ambil',
+                'jumlah_gula'
             )
+            ->whereYear('tanggal_ambil', $this->tahunAktif)
+            ->whereMonth('tanggal_ambil', $this->bulanAktif);
+
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY UTAMA — MULAI DARI KARYAWAN (LEFT JOIN)
+        |--------------------------------------------------------------------------
+        |
+        | Supaya karyawan yang belum mengambil gula di bulan ini
+        | tetap ikut muncul di export, bukan cuma yang sudah ambil.
+        |
+        */
+
+        $query = DB::table('karyawan')
+
+            ->leftJoinSub(
+                $pengambilanQuery,
+                'pengambilan',
+                function ($join) {
+                    $join->on(
+                        'karyawan.id',
+                        '=',
+                        'pengambilan.karyawan_id'
+                    );
+                }
+            )
+
             ->select(
                 'karyawan.nik',
                 'karyawan.nama',
                 'karyawan.kategori',
                 'karyawan.bagian',
-                'pengambilan_gula.tanggal_ambil'
+                'pengambilan.tanggal_ambil',
+
+                DB::raw(
+                    'COALESCE(
+                        pengambilan.jumlah_gula,
+                        0
+                    ) as jumlah_gula'
+                )
             );
 
-        if ($this->request->filled('tanggal_awal')) {
-            $query->whereDate(
-                'pengambilan_gula.tanggal_ambil',
-                '>=',
-                $this->request->tanggal_awal
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | SEARCH NAMA / NIK (opsional, ikut filter di halaman laporan)
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->request->filled('search')) {
+
+            $search = trim($this->request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('karyawan.nama', 'like', "%{$search}%")
+                  ->orWhere('karyawan.nik', 'like', "%{$search}%");
+            });
         }
 
-        if ($this->request->filled('tanggal_akhir')) {
-            $query->whereDate(
-                'pengambilan_gula.tanggal_ambil',
-                '<=',
-                $this->request->tanggal_akhir
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER STATUS (opsional, ikut filter di halaman laporan)
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->request->filled('status')) {
+
+            if ($this->request->status === 'sudah') {
+                $query->whereNotNull('pengambilan.karyawan_id');
+            } elseif ($this->request->status === 'belum') {
+                $query->whereNull('pengambilan.karyawan_id');
+            }
         }
 
         return $query
@@ -66,7 +128,10 @@ class LaporanGulaExport implements
                     $item->nama,
                     $item->kategori,
                     $item->bagian,
-                    $item->tanggal_ambil ?? '-',
+                    $item->tanggal_ambil
+                        ? date('d-m-Y', strtotime($item->tanggal_ambil))
+                        : '-',
+                    $item->tanggal_ambil ? $item->jumlah_gula : '-',
                     $item->tanggal_ambil
                         ? 'Sudah Mengambil'
                         : 'Belum Mengambil',
@@ -82,6 +147,7 @@ class LaporanGulaExport implements
             'Kategori',
             'Bagian',
             'Tanggal Ambil',
+            'Jumlah Gula (KG)',
             'Status',
         ];
     }
