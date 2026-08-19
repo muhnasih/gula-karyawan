@@ -580,6 +580,77 @@
     }
 
     /* =========================================================
+       PAGINATION
+    ========================================================= */
+
+    .pagination-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 13px 4px 2px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-info {
+        color: #8993a2;
+        font-size: .68rem;
+    }
+
+    .pagination-info strong {
+        color: #536074;
+    }
+
+    /* Menimpa tampilan default Laravel pagination (Bootstrap 5)
+       agar selaras dengan desain kartu di halaman ini */
+    .pagination-wrap nav > .flex,
+    .pagination-wrap nav {
+        width: auto;
+    }
+
+    .pagination-wrap .pagination {
+        margin: 0;
+        display: flex;
+        gap: 5px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .pagination-wrap .pagination .page-item .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 30px;
+        padding: 0 8px;
+        border: 1px solid #e4e9ef;
+        border-radius: 8px;
+        background: #fff;
+        color: #596678;
+        font-size: .7rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .15s ease;
+    }
+
+    .pagination-wrap .pagination .page-item .page-link:hover {
+        background: #f4f6f9;
+        color: #3d495b;
+    }
+
+    .pagination-wrap .pagination .page-item.active .page-link {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+
+    .pagination-wrap .pagination .page-item.disabled .page-link {
+        color: #c4cad4;
+        background: #fafbfd;
+        cursor: default;
+    }
+
+    /* =========================================================
        RESPONSIVE TABLET
     ========================================================= */
 
@@ -739,6 +810,15 @@
         .kg-badge {
             font-size: .55rem;
             padding: 4px 6px;
+        }
+
+        .pagination-wrap {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .pagination-wrap .pagination {
+            justify-content: center;
         }
     }
 
@@ -930,10 +1010,10 @@
                     </div>
                 </div>
 
-                @if($daftarSudahAmbil->count() > 0)
+                @if($daftarSudahAmbil->total() > 0)
                     <div class="count-badge blue">
                         <i class="bi bi-people"></i>
-                        {{ $daftarSudahAmbil->count() }} orang
+                        {{ $daftarSudahAmbil->total() }} orang
                     </div>
                 @endif
             </div>
@@ -1006,11 +1086,13 @@
 
 
                 {{-- RINGKASAN HASIL --}}
-                @if($daftarSudahAmbil->count() > 0)
+                @if($daftarSudahAmbil->total() > 0)
                     <div class="result-summary">
                         <div class="result-text">
                             Menampilkan
                             <strong>{{ $daftarSudahAmbil->count() }}</strong>
+                            dari
+                            <strong>{{ $daftarSudahAmbil->total() }}</strong>
                             data pengambilan
                         </div>
 
@@ -1025,14 +1107,14 @@
 
 
                 {{-- LIST SUDAH MENGAMBIL --}}
-                @if($daftarSudahAmbil->count() > 0)
+                @if($daftarSudahAmbil->total() > 0)
                     <div class="data-list">
                         <div class="data-list-scroll">
                             @foreach($daftarSudahAmbil as $index => $item)
                                 <div class="data-item">
 
                                     <div class="data-number">
-                                        {{ $index + 1 }}
+                                        {{ $daftarSudahAmbil->firstItem() + $index }}
                                     </div>
 
                                     <div class="data-avatar">
@@ -1065,6 +1147,19 @@
                             @endforeach
                         </div>
                     </div>
+
+                    {{-- PAGINATION --}}
+                    @if($daftarSudahAmbil->hasPages())
+                        <div class="pagination-wrap">
+                            <div class="pagination-info">
+                                Halaman
+                                <strong>{{ $daftarSudahAmbil->currentPage() }}</strong>
+                                dari
+                                <strong>{{ $daftarSudahAmbil->lastPage() }}</strong>
+                            </div>
+                            {{ $daftarSudahAmbil->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 @else
                     <div class="empty-state">
                         <div class="empty-icon">
@@ -1100,24 +1195,24 @@
                     </div>
                 </div>
 
-                @if($karyawanBelumAmbil->count() > 0)
+                @if($karyawanBelumAmbil->total() > 0)
                     <div class="count-badge">
                         <i class="bi bi-clock"></i>
-                        {{ $karyawanBelumAmbil->count() }} orang
+                        {{ $karyawanBelumAmbil->total() }} orang
                     </div>
                 @endif
             </div>
 
             <div class="dashboard-card-body">
 
-                @if($karyawanBelumAmbil->count() > 0)
+                @if($karyawanBelumAmbil->total() > 0)
                     <div class="data-list">
                         <div class="data-list-scroll">
                             @foreach($karyawanBelumAmbil as $index => $karyawan)
                                 <div class="data-item">
 
                                     <div class="data-number">
-                                        {{ $index + 1 }}
+                                        {{ $karyawanBelumAmbil->firstItem() + $index }}
                                     </div>
 
                                     <div class="data-avatar warning">
@@ -1145,6 +1240,19 @@
                             @endforeach
                         </div>
                     </div>
+
+                    {{-- PAGINATION --}}
+                    @if($karyawanBelumAmbil->hasPages())
+                        <div class="pagination-wrap">
+                            <div class="pagination-info">
+                                Halaman
+                                <strong>{{ $karyawanBelumAmbil->currentPage() }}</strong>
+                                dari
+                                <strong>{{ $karyawanBelumAmbil->lastPage() }}</strong>
+                            </div>
+                            {{ $karyawanBelumAmbil->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 @else
                     <div class="empty-state">
                         <div class="empty-icon success">

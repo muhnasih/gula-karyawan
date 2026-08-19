@@ -11,17 +11,32 @@ use Illuminate\Http\Request;
 class OperatorStatistikController extends Controller
 {
     /**
+     * Jumlah item per halaman untuk masing-masing daftar.
+     * Diletakkan sebagai konstanta supaya mudah diubah dari satu tempat.
+     */
+    private const PER_PAGE_SUDAH_AMBIL = 15;
+    private const PER_PAGE_BELUM_AMBIL = 15;
+
+    /**
      * Halaman Statistik Operator
      */
     public function index(Request $request)
     {
         // =========================================================
+        // VALIDASI INPUT FILTER
+        // =========================================================
+        $validated = $request->validate([
+            'periode'       => 'nullable|date_format:Y-m',
+            'tanggal_awal'  => 'nullable|date',
+            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_awal',
+            'search'        => 'nullable|string|max:100',
+        ]);
+
+
+        // =========================================================
         // PERIODE
         // =========================================================
-        $periode = $request->get(
-            'periode',
-            Carbon::now()->format('Y-m')
-        );
+        $periode = $validated['periode'] ?? Carbon::now()->format('Y-m');
 
         try {
             $tanggalPeriode = Carbon::createFromFormat('Y-m', $periode);
@@ -45,12 +60,6 @@ class OperatorStatistikController extends Controller
         // =========================================================
         $pengambilanQuery = PengambilanGula::whereYear('tanggal_ambil', $tahun)
             ->whereMonth('tanggal_ambil', $bulan);
-
-
-        // =========================================================
-        // TOTAL PENGAMBILAN
-        // =========================================================
-        $totalPengambilan = (clone $pengambilanQuery)->count();
 
 
         // =========================================================
@@ -82,20 +91,25 @@ class OperatorStatistikController extends Controller
 
 
         // =========================================================
-        // KARYAWAN YANG BELUM MENGAMBIL
+        // KARYAWAN YANG BELUM MENGAMBIL (PAGINATED)
         // =========================================================
         $karyawanBelumAmbil = Karyawan::aktif()
             ->whereNotIn('id', $karyawanSudahAmbilIds)
             ->orderBy('nama')
-            ->get();
+            ->paginate(
+                self::PER_PAGE_BELUM_AMBIL,
+                ['*'],
+                'page_belum' // nama parameter halaman khusus, agar tidak bentrok dgn paginator lain
+            )
+            ->withQueryString();
 
 
         // =========================================================
         // DAFTAR "SUDAH MENGAMBIL" + FILTER
         // =========================================================
-        $tanggalAwal  = $request->get('tanggal_awal');
-        $tanggalAkhir = $request->get('tanggal_akhir');
-        $search       = $request->get('search');
+        $tanggalAwal  = $validated['tanggal_awal'] ?? null;
+        $tanggalAkhir = $validated['tanggal_akhir'] ?? null;
+        $search       = $validated['search'] ?? null;
 
         $daftarSudahAmbilQuery = PengambilanGula::with('karyawan')
             ->latest('tanggal_ambil')
@@ -125,19 +139,27 @@ class OperatorStatistikController extends Controller
             });
         }
 
-        $daftarSudahAmbil     = (clone $daftarSudahAmbilQuery)->get();
-        $totalGulaSudahAmbil  = (clone $daftarSudahAmbilQuery)->sum('jumlah_gula');
+        // Total kg dihitung dari SELURUH hasil filter (bukan cuma 1 halaman),
+        // jadi harus di-clone SEBELUM paginate() dipanggil.
+        $totalGulaSudahAmbil = (clone $daftarSudahAmbilQuery)->sum('jumlah_gula');
+
+        $daftarSudahAmbil = $daftarSudahAmbilQuery
+            ->paginate(
+                self::PER_PAGE_SUDAH_AMBIL,
+                ['*'],
+                'page_sudah' // nama parameter halaman khusus, agar tidak bentrok dgn paginator lain
+            )
+            ->withQueryString();
 
 
         // =========================================================
         // STATISTIK
         // =========================================================
         $statistik = [
-            'total_karyawan'    => $totalKaryawan,
-            'total_pengambilan' => $totalPengambilan,
-            'sudah_ambil'       => $sudahAmbil,
-            'belum_ambil'       => $belumAmbil,
-            'total_kg'          => $totalKg,
+            'total_karyawan' => $totalKaryawan,
+            'sudah_ambil'    => $sudahAmbil,
+            'belum_ambil'    => $belumAmbil,
+            'total_kg'       => $totalKg,
         ];
 
 
@@ -146,8 +168,6 @@ class OperatorStatistikController extends Controller
         // =========================================================
         return view('operator.statistik.index', compact(
             'periode',
-            'tahun',
-            'bulan',
             'statistik',
             'karyawanBelumAmbil',
             'daftarSudahAmbil',
