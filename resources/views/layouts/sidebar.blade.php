@@ -160,6 +160,36 @@
 
 
                     {{-- =========================================
+                        JATAH GULA
+                    ========================================== --}}
+
+                    @php
+
+                        $isJatahGulaMenuActive =
+                            request()->routeIs('admin.jatah-gula.*');
+
+                    @endphp
+
+
+                    <a
+                        href="{{ route('admin.jatah-gula.index') }}"
+                        class="nav-link mb-1 {{ $isJatahGulaMenuActive ? 'active' : '' }}"
+                        @if($isJatahGulaMenuActive)
+                            aria-current="page"
+                        @endif
+                    >
+
+                        <i class="bi bi-basket-fill"></i>
+
+                        <span>
+                            Jatah Gula
+                        </span>
+
+                    </a>
+
+
+
+                    {{-- =========================================
                         LAPORAN
                     ========================================== --}}
 

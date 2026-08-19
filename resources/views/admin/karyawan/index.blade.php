@@ -49,6 +49,39 @@
         vertical-align: middle;
     }
 
+    /* =========================================================
+       BULK ACTION TOOLBAR
+    ========================================================= */
+
+    .bulk-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .bulk-toolbar .form-check-input {
+        cursor: pointer;
+    }
+
+    .bulk-action-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .row-checkbox {
+        cursor: pointer;
+    }
+
+    .mobile-checkbox-wrap {
+        display: flex;
+        align-items: flex-start;
+        padding-top: 2px;
+    }
+
     @media (max-width: 767.98px) {
 
         .employee-action {
@@ -63,6 +96,10 @@
 
         .card {
             border-radius: 12px;
+        }
+
+        .bulk-toolbar {
+            justify-content: flex-start;
         }
     }
 </style>
@@ -81,7 +118,7 @@
             </h2>
 
             <p class="text-muted mb-0 small">
-                Kelola data karyawan
+                Kelola data karyawan dan pengaturan jatah gula berdasarkan status.
             </p>
         </div>
 
@@ -90,12 +127,12 @@
         <div class="employee-action">
 
             {{-- TAMBAH KARYAWAN --}}
-            <a href="{{ route('admin.karyawan.create') }}"
-               class="btn btn-success">
-
+            <a
+                href="{{ route('admin.karyawan.create') }}"
+                class="btn btn-success"
+            >
                 <i class="bi bi-person-plus me-1"></i>
                 Tambah Karyawan
-
             </a>
 
 
@@ -106,10 +143,8 @@
                 data-bs-toggle="modal"
                 data-bs-target="#modalImportExcel"
             >
-
                 <i class="bi bi-file-earmark-excel me-1"></i>
                 Import Excel
-
             </button>
 
 
@@ -118,10 +153,8 @@
                 href="{{ route('admin.karyawan.template') }}"
                 class="btn btn-outline-success"
             >
-
                 <i class="bi bi-download me-1"></i>
                 Template Excel
-
             </a>
 
         </div>
@@ -138,7 +171,6 @@
             class="alert alert-success alert-dismissible fade show shadow-sm"
             role="alert"
         >
-
             <i class="bi bi-check-circle-fill me-2"></i>
 
             {{ session('success') }}
@@ -148,7 +180,6 @@
                 class="btn-close"
                 data-bs-dismiss="alert"
             ></button>
-
         </div>
 
     @endif
@@ -163,7 +194,6 @@
             class="alert alert-danger alert-dismissible fade show shadow-sm"
             role="alert"
         >
-
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
 
             {{ session('error') }}
@@ -173,7 +203,6 @@
                 class="btn-close"
                 data-bs-dismiss="alert"
             ></button>
-
         </div>
 
     @endif
@@ -198,7 +227,9 @@
 
                 @foreach ($errors->all() as $error)
 
-                    <li>{{ $error }}</li>
+                    <li>
+                        {{ $error }}
+                    </li>
 
                 @endforeach
 
@@ -235,7 +266,10 @@
 
         <div class="col-6 col-md-3">
 
-            <select name="kategori" class="form-select">
+            <select
+                name="kategori"
+                class="form-select"
+            >
 
                 <option value="">
                     Semua Kategori
@@ -259,7 +293,10 @@
 
         <div class="col-6 col-md-3">
 
-            <select name="status" class="form-select">
+            <select
+                name="status"
+                class="form-select"
+            >
 
                 <option value="">
                     Semua Status
@@ -289,6 +326,7 @@
             >
 
                 <i class="bi bi-search me-1"></i>
+
                 Cari
 
             </button>
@@ -296,6 +334,53 @@
         </div>
 
     </form>
+
+
+    {{-- =========================================================
+        TOOLBAR BULK ACTION
+    ========================================================== --}}
+    <div class="bulk-toolbar">
+
+        <div class="form-check d-flex align-items-center gap-2 mb-0">
+
+            <input
+                type="checkbox"
+                class="form-check-input select-all-checkbox"
+                id="selectAllTop"
+                aria-label="Pilih semua data karyawan"
+            >
+
+            <label
+                class="form-check-label small text-muted mb-0"
+                for="selectAllTop"
+            >
+                Pilih Semua
+            </label>
+
+        </div>
+
+
+        <div
+            id="bulkActionBar"
+            class="bulk-action-bar d-none"
+        >
+
+            <button
+                type="button"
+                id="bulkDeleteBtn"
+                class="btn btn-sm btn-danger"
+            >
+
+                <i class="bi bi-trash me-1"></i>
+
+                Hapus Terpilih
+                (<span id="bulkSelectedCount">0</span>)
+
+            </button>
+
+        </div>
+
+    </div>
 
 
     {{-- =========================================================
@@ -309,12 +394,13 @@
 
                 <colgroup>
 
-                    <col style="width: 12%">
-                    <col style="width: 22%">
-                    <col style="width: 16%">
+                    <col style="width: 4%">
+                    <col style="width: 10%">
+                    <col style="width: 20%">
                     <col style="width: 15%">
+                    <col style="width: 14%">
+                    <col style="width: 11%">
                     <col style="width: 12%">
-                    <col style="width: 13%">
                     <col style="width: 10%">
 
                 </colgroup>
@@ -324,13 +410,25 @@
 
                     <tr>
 
+                        <th>
+
+                            <input
+                                type="checkbox"
+                                class="form-check-input select-all-checkbox"
+                                aria-label="Pilih semua data karyawan"
+                            >
+
+                        </th>
+
                         <th>NIK</th>
                         <th>NAMA</th>
                         <th>JABATAN</th>
                         <th>BAGIAN</th>
                         <th>STATUS</th>
                         <th>KATEGORI</th>
-                        <th class="text-center">AKSI</th>
+                        <th class="text-center">
+                            AKSI
+                        </th>
 
                     </tr>
 
@@ -342,6 +440,19 @@
                     @forelse ($karyawan as $item)
 
                         <tr>
+
+                            <td>
+
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input row-checkbox"
+                                    data-scope="desktop"
+                                    value="{{ $item->id }}"
+                                    aria-label="Pilih {{ $item->nama }}"
+                                >
+
+                            </td>
+
 
                             <td
                                 class="text-truncate"
@@ -467,7 +578,7 @@
                         <tr>
 
                             <td
-                                colspan="7"
+                                colspan="8"
                                 class="text-center text-muted py-4"
                             >
 
@@ -501,15 +612,32 @@
 
                     <div class="d-flex justify-content-between align-items-start mb-2">
 
-                        <div>
+                        <div class="d-flex gap-2">
 
-                            <h6 class="fw-bold mb-0">
-                                {{ $item->nama }}
-                            </h6>
+                            <div class="mobile-checkbox-wrap">
 
-                            <small class="text-muted">
-                                {{ $item->nik }}
-                            </small>
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input row-checkbox"
+                                    data-scope="mobile"
+                                    value="{{ $item->id }}"
+                                    aria-label="Pilih {{ $item->nama }}"
+                                >
+
+                            </div>
+
+
+                            <div>
+
+                                <h6 class="fw-bold mb-0">
+                                    {{ $item->nama }}
+                                </h6>
+
+                                <small class="text-muted">
+                                    {{ $item->nik }}
+                                </small>
+
+                            </div>
 
                         </div>
 
@@ -657,6 +785,24 @@
 
 
 {{-- =========================================================
+    FORM TERSEMBUNYI UNTUK HAPUS BANYAK SEKALIGUS
+========================================================= --}}
+<form
+    id="bulkDeleteForm"
+    action="{{ route('admin.karyawan.bulk-destroy') }}"
+    method="POST"
+    class="d-none"
+>
+
+    @csrf
+    @method('DELETE')
+
+    <div id="bulkDeleteInputs"></div>
+
+</form>
+
+
+{{-- =========================================================
     MODAL IMPORT EXCEL
 ========================================================= --}}
 <div
@@ -709,8 +855,8 @@
 
                         <i class="bi bi-info-circle-fill me-1"></i>
 
-                        Gunakan template Excel yang telah disediakan
-                        agar format data sesuai dengan sistem.
+                        Gunakan template Excel yang telah disediakan agar
+                        format data sesuai dengan sistem.
 
                     </div>
 
@@ -781,8 +927,8 @@
 
                         <i class="bi bi-shield-check me-1"></i>
 
-                        NIK yang sudah terdaftar akan otomatis
-                        dilewati agar tidak terjadi data duplikat.
+                        NIK yang sudah terdaftar akan otomatis dilewati
+                        agar tidak terjadi data duplikat.
 
                     </div>
 
@@ -822,5 +968,161 @@
     </div>
 
 </div>
+
+
+{{-- =========================================================
+    SCRIPT BULK DELETE
+========================================================= --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const selectAllCheckboxes = document.querySelectorAll('.select-all-checkbox');
+        const bulkActionBar = document.getElementById('bulkActionBar');
+        const bulkSelectedCount = document.getElementById('bulkSelectedCount');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+        const bulkDeleteInputs = document.getElementById('bulkDeleteInputs');
+
+
+        // =========================================================
+        // AMBIL CHECKBOX BARIS DENGAN SCOPE "DESKTOP"
+        // =========================================================
+        // Setiap karyawan punya 2 checkbox di DOM (versi desktop &
+        // versi mobile), tapi cuma salah satu yang terlihat lewat CSS.
+        // Supaya jumlah tidak dihitung dobel, hitung dari scope
+        // "desktop" saja — datanya lengkap sama di kedua scope.
+
+        function getDesktopCheckboxes() {
+
+            return document.querySelectorAll(
+                '.row-checkbox[data-scope="desktop"]'
+            );
+        }
+
+
+        function updateBulkBar() {
+
+            const checkedCount =
+                document.querySelectorAll(
+                    '.row-checkbox[data-scope="desktop"]:checked'
+                ).length;
+
+            if (checkedCount > 0) {
+
+                bulkActionBar.classList.remove('d-none');
+
+            } else {
+
+                bulkActionBar.classList.add('d-none');
+            }
+
+            bulkSelectedCount.textContent = checkedCount;
+        }
+
+
+        function syncSelectAllState() {
+
+            const desktopCheckboxes = getDesktopCheckboxes();
+
+            const total = desktopCheckboxes.length;
+
+            const checkedTotal =
+                document.querySelectorAll(
+                    '.row-checkbox[data-scope="desktop"]:checked'
+                ).length;
+
+            selectAllCheckboxes.forEach(function (selectAll) {
+
+                selectAll.checked =
+                    total > 0 && checkedTotal === total;
+            });
+        }
+
+
+        // =========================================================
+        // SINKRONKAN CHECKBOX DESKTOP <-> MOBILE UNTUK ID YANG SAMA
+        // =========================================================
+
+        rowCheckboxes.forEach(function (checkbox) {
+
+            checkbox.addEventListener('change', function () {
+
+                const value = checkbox.value;
+
+                document
+                    .querySelectorAll(
+                        '.row-checkbox[value="' + value + '"]'
+                    )
+                    .forEach(function (el) {
+                        el.checked = checkbox.checked;
+                    });
+
+                updateBulkBar();
+                syncSelectAllState();
+            });
+        });
+
+
+        // =========================================================
+        // TOMBOL "PILIH SEMUA"
+        // =========================================================
+
+        selectAllCheckboxes.forEach(function (selectAll) {
+
+            selectAll.addEventListener('change', function () {
+
+                rowCheckboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAll.checked;
+                });
+
+                updateBulkBar();
+                syncSelectAllState();
+            });
+        });
+
+
+        // =========================================================
+        // TOMBOL "HAPUS TERPILIH"
+        // =========================================================
+
+        bulkDeleteBtn.addEventListener('click', function () {
+
+            const checked = document.querySelectorAll(
+                '.row-checkbox[data-scope="desktop"]:checked'
+            );
+
+            if (checked.length === 0) {
+                return;
+            }
+
+            const konfirmasi = confirm(
+                'Apakah Anda yakin ingin menghapus ' +
+                checked.length +
+                ' data karyawan terpilih? Tindakan ini tidak dapat dibatalkan.'
+            );
+
+            if (!konfirmasi) {
+                return;
+            }
+
+            bulkDeleteInputs.innerHTML = '';
+
+            checked.forEach(function (checkbox) {
+
+                const input = document.createElement('input');
+
+                input.type = 'hidden';
+                input.name = 'ids[]';
+                input.value = checkbox.value;
+
+                bulkDeleteInputs.appendChild(input);
+            });
+
+            bulkDeleteForm.submit();
+        });
+
+    });
+</script>
 
 @endsection

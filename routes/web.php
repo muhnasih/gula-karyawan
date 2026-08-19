@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\JatahGulaController;
 
 // =========================================================
 // OPERATOR CONTROLLERS
@@ -174,12 +175,37 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
+            | HAPUS BANYAK KARYAWAN SEKALIGUS
+            |--------------------------------------------------------------------------
+            | Diletakkan sebelum route dinamis {karyawan} agar
+            | "bulk-destroy" tidak tertangkap sebagai parameter ID.
+            */
+
+            Route::delete('/karyawan/bulk-destroy', [KaryawanController::class, 'bulkDestroy'])
+                ->name('karyawan.bulk-destroy');
+
+
+            /*
+            |--------------------------------------------------------------------------
             | HAPUS KARYAWAN
             |--------------------------------------------------------------------------
             */
 
             Route::delete('/karyawan/{karyawan}', [KaryawanController::class, 'destroy'])
                 ->name('karyawan.destroy');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PENGATURAN JATAH GULA
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/jatah-gula', [JatahGulaController::class, 'index'])
+                ->name('jatah-gula.index');
+
+            Route::post('/jatah-gula', [JatahGulaController::class, 'update'])
+                ->name('jatah-gula.update');
 
 
             /*
@@ -286,10 +312,6 @@ Route::middleware('auth')->group(function () {
             |--------------------------------------------------------------------------
             | STATISTIK OPERATOR
             |--------------------------------------------------------------------------
-            |
-            | Statistik merupakan MENU / FITUR TERPISAH
-            | dari Dashboard Operator.
-            |
             */
 
             Route::get('/statistik', [OperatorStatistikController::class, 'index'])

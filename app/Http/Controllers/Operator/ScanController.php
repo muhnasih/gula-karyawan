@@ -3,76 +3,47 @@
 namespace App\Http\Controllers\Operator;
 
 use App\Http\Controllers\Controller;
+use App\Models\AturanJatahGula;
 use App\Models\Karyawan;
 use App\Models\PengambilanGula;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ScanController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | JATAH GULA BERDASARKAN STATUS KARYAWAN
-    |--------------------------------------------------------------------------
-    |
-    | KARPIM      = 10 KG
-    | KARPEL      = 5 KG
-    | KAMPANYE    = ? KG   <-- ISI SESUAI KETENTUAN
-    | PKWT        = ? KG   <-- ISI SESUAI KETENTUAN
-    | HONORER     = ? KG   <-- ISI SESUAI KETENTUAN
-    | OS LMG-DMG  = ? KG   <-- ISI SESUAI KETENTUAN
-    | OS DMG      = ? KG   <-- ISI SESUAI KETENTUAN
-    |
-    */
-
+    /**
+     * =========================================================
+     * JATAH GULA BERDASARKAN STATUS KARYAWAN (DINAMIS DARI DB)
+     * =========================================================
+     */
     private function tentukanJatahGula(?string $status): ?int
     {
-        // Normalisasi status:
-        // - jika null menjadi string kosong
-        // - hapus spasi awal/akhir
-        // - ubah menjadi huruf besar
-        $status = strtoupper(trim((string) $status));
-
-        return match ($status) {
-            'KARPIM' => 10,
-            'KARPEL' => 5,
-
-            // TODO: lengkapi jatah untuk status berikut jika memang berhak
-            // 'KAMPANYE' => ...,
-            // 'PKWT' => ...,
-            // 'HONORER' => ...,
-            // 'OS LMG-DMG' => ...,
-            // 'OS DMG' => ...,
-
-            // Status lain belum memiliki jatah
-            default => null,
-        };
+        return AturanJatahGula::getJatahByStatus($status);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | NORMALISASI STATUS
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * =========================================================
+     * NORMALISASI STATUS
+     * =========================================================
+     */
     private function normalisasiStatus(?string $status): string
     {
         return strtoupper(
             trim(
-                preg_replace('/\s+/', ' ', (string) $status)
+                preg_replace(
+                    '/\s+/',
+                    ' ',
+                    (string) $status
+                )
             )
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | HALAMAN SCANNER
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * =========================================================
+     * HALAMAN SCANNER
+     * =========================================================
+     */
     public function index()
     {
         $riwayat = PengambilanGula::with('karyawan')
@@ -82,11 +53,17 @@ class ScanController extends Controller
             ->map(function ($item) {
                 return (object) [
                     'nik' => $item->karyawan->nik ?? '-',
+
                     'nama' => $item->karyawan->nama ?? '-',
+
                     'status' => $item->karyawan->status ?? '-',
+
                     'tanggal_ambil' => $item->tanggal_ambil
-                        ? Carbon::parse($item->tanggal_ambil)->format('d-m-Y')
+                        ? Carbon::parse(
+                            $item->tanggal_ambil
+                        )->format('d-m-Y')
                         : '-',
+
                     'jumlah_gula' => $item->jumlah_gula ?? 0,
                 ];
             });
@@ -97,21 +74,13 @@ class ScanController extends Controller
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROSES HASIL SCAN QR
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * =========================================================
+     * PROSES SCAN QR / NIK
+     * =========================================================
+     */
     public function store(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI NIK
-        |--------------------------------------------------------------------------
-        */
-
         $request->validate([
             'nik' => [
                 'required',
@@ -119,32 +88,14 @@ class ScanController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | AMBIL NIK
-        |--------------------------------------------------------------------------
-        */
-
         $nik = trim($request->nik);
 
-
         /*
-        |--------------------------------------------------------------------------
-        | CARI KARYAWAN AKTIF
-        |--------------------------------------------------------------------------
-        */
-
+         * Cari karyawan aktif.
+         */
         $karyawan = Karyawan::aktif()
             ->where('nik', $nik)
             ->first();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | KARYAWAN TIDAK DITEMUKAN
-        |--------------------------------------------------------------------------
-        */
 
         if (!$karyawan) {
             return response()->json([
@@ -154,42 +105,30 @@ class ScanController extends Controller
             ], 404);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | NORMALISASI STATUS
-        |--------------------------------------------------------------------------
-        */
-
+         * Normalisasi status.
+         */
         $statusKaryawan = $this->normalisasiStatus(
             $karyawan->status
         );
 
-
         /*
-        |--------------------------------------------------------------------------
-        | TENTUKAN JATAH GULA
-        |--------------------------------------------------------------------------
-        */
-
+         * Tentukan jatah berdasarkan STATUS (mengambil dari Database).
+         */
         $jumlahGula = $this->tentukanJatahGula(
             $statusKaryawan
         );
 
-
         /*
-        |--------------------------------------------------------------------------
-        | STATUS TIDAK MEMILIKI JATAH
-        |--------------------------------------------------------------------------
-        */
-
+         * Status belum mempunyai aturan jatah.
+         */
         if ($jumlahGula === null) {
             return response()->json([
                 'success' => false,
+
                 'status' => 'status_tidak_valid',
 
-                'message' =>
-                    'Status karyawan belum memiliki jatah gula.',
+                'message' => 'Status karyawan belum memiliki jatah gula pada sistem.',
 
                 'status_karyawan' => $karyawan->status,
 
@@ -201,13 +140,9 @@ class ScanController extends Controller
             ], 422);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | PERIODE BULAN SEKARANG
-        |--------------------------------------------------------------------------
-        */
-
+         * Periode sekarang.
+         */
         $sekarang = Carbon::now();
 
         $tahun = $sekarang->year;
@@ -216,13 +151,9 @@ class ScanController extends Controller
 
         $periode = $sekarang->format('Y-m');
 
-
         /*
-        |--------------------------------------------------------------------------
-        | CEK PENGAMBILAN BULAN INI
-        |--------------------------------------------------------------------------
-        */
-
+         * Cari pengambilan pada bulan berjalan.
+         */
         $pengambilan = PengambilanGula::where(
                 'karyawan_id',
                 $karyawan->id
@@ -238,39 +169,37 @@ class ScanController extends Controller
             ->latest('tanggal_ambil')
             ->first();
 
-
         /*
-        |--------------------------------------------------------------------------
-        | DATA KARYAWAN
-        |--------------------------------------------------------------------------
-        */
-
+         * Data karyawan.
+         */
         $dataKaryawan = [
             'id' => $karyawan->id,
+
             'nik' => $karyawan->nik,
+
             'nama' => $karyawan->nama,
+
             'jabatan' => $karyawan->jabatan,
+
             'bagian' => $karyawan->bagian,
+
             'status' => $statusKaryawan,
+
             'kategori' => $karyawan->kategori,
+
             'keterangan' => $karyawan->keterangan,
         ];
 
-
         /*
-        |--------------------------------------------------------------------------
-        | BELUM MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
-
+         * Belum mengambil.
+         */
         if (!$pengambilan) {
             return response()->json([
                 'success' => true,
 
                 'status' => 'belum',
 
-                'message' =>
-                    'Karyawan belum mengambil gula bulan ini.',
+                'message' => 'Karyawan belum mengambil gula bulan ini.',
 
                 'karyawan' => $dataKaryawan,
 
@@ -284,20 +213,15 @@ class ScanController extends Controller
             ]);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | SUDAH MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
-
+         * Sudah mengambil.
+         */
         return response()->json([
             'success' => true,
 
             'status' => 'sudah',
 
-            'message' =>
-                'Karyawan sudah mengambil gula bulan ini.',
+            'message' => 'Karyawan sudah mengambil gula bulan ini.',
 
             'karyawan' => $dataKaryawan,
 
@@ -305,35 +229,25 @@ class ScanController extends Controller
 
             'bulan' => $sekarang->translatedFormat('F Y'),
 
-            'jumlah_gula' =>
-                $pengambilan->jumlah_gula ?? $jumlahGula,
+            'jumlah_gula' => $pengambilan->jumlah_gula ?? $jumlahGula,
 
             'satuan' => 'KG',
 
-            'tanggal_ambil' =>
-                $pengambilan->tanggal_ambil
-                    ? Carbon::parse(
-                        $pengambilan->tanggal_ambil
-                    )->format('d-m-Y')
-                    : null,
+            'tanggal_ambil' => $pengambilan->tanggal_ambil
+                ? Carbon::parse(
+                    $pengambilan->tanggal_ambil
+                )->format('d-m-Y')
+                : null,
         ]);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | KONFIRMASI PENGAMBILAN GULA
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * =========================================================
+     * KONFIRMASI PENGAMBILAN
+     * =========================================================
+     */
     public function confirm(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI REQUEST
-        |--------------------------------------------------------------------------
-        */
-
         $request->validate([
             'nik' => [
                 'required',
@@ -346,34 +260,16 @@ class ScanController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | NORMALISASI NIK
-        |--------------------------------------------------------------------------
-        */
-
         $nik = trim($request->nik);
 
         $periode = trim($request->periode);
 
-
         /*
-        |--------------------------------------------------------------------------
-        | CARI KARYAWAN AKTIF
-        |--------------------------------------------------------------------------
-        */
-
+         * Cari karyawan aktif.
+         */
         $karyawan = Karyawan::aktif()
             ->where('nik', $nik)
             ->first();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | KARYAWAN TIDAK DITEMUKAN
-        |--------------------------------------------------------------------------
-        */
 
         if (!$karyawan) {
             return response()->json([
@@ -381,39 +277,23 @@ class ScanController extends Controller
 
                 'status' => 'tidak_ditemukan',
 
-                'message' =>
-                    'Karyawan tidak ditemukan.',
+                'message' => 'Karyawan tidak ditemukan.',
             ], 404);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | NORMALISASI STATUS
-        |--------------------------------------------------------------------------
-        */
-
+         * Normalisasi status.
+         */
         $statusKaryawan = $this->normalisasiStatus(
             $karyawan->status
         );
 
-
         /*
-        |--------------------------------------------------------------------------
-        | TENTUKAN JATAH GULA
-        |--------------------------------------------------------------------------
-        */
-
+         * Tentukan jatah berdasarkan STATUS (mengambil dari Database).
+         */
         $jumlahGula = $this->tentukanJatahGula(
             $statusKaryawan
         );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI STATUS
-        |--------------------------------------------------------------------------
-        */
 
         if ($jumlahGula === null) {
             return response()->json([
@@ -421,33 +301,21 @@ class ScanController extends Controller
 
                 'status' => 'status_tidak_valid',
 
-                'message' =>
-                    'Status karyawan belum memiliki jatah gula.',
+                'message' => 'Status karyawan belum memiliki jatah gula pada sistem.',
 
-                'status_karyawan' =>
-                    $karyawan->status,
+                'status_karyawan' => $karyawan->status,
 
-                'status_normalisasi' =>
-                    $statusKaryawan,
+                'status_normalisasi' => $statusKaryawan,
 
-                'nik' =>
-                    $karyawan->nik,
+                'nik' => $karyawan->nik,
 
-                'nama' =>
-                    $karyawan->nama,
+                'nama' => $karyawan->nama,
             ], 422);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | PASTIKAN PERIODE YANG DIPILIH ADALAH BULAN SEKARANG
-        |--------------------------------------------------------------------------
-        |
-        | Pengambilan hanya boleh dilakukan untuk bulan berjalan.
-        |
-        */
-
+         * Pengambilan hanya boleh bulan berjalan.
+         */
         $periodeSekarang = Carbon::now()->format('Y-m');
 
         if ($periode !== $periodeSekarang) {
@@ -456,36 +324,25 @@ class ScanController extends Controller
 
                 'status' => 'periode_tidak_valid',
 
-                'message' =>
-                    'Pengambilan gula hanya dapat dilakukan untuk periode bulan berjalan.',
+                'message' => 'Pengambilan gula hanya dapat dilakukan untuk periode bulan berjalan.',
 
-                'periode_diminta' =>
-                    $periode,
+                'periode_diminta' => $periode,
 
-                'periode_sekarang' =>
-                    $periodeSekarang,
+                'periode_sekarang' => $periodeSekarang,
             ], 422);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | PECAH PERIODE
-        |--------------------------------------------------------------------------
-        */
-
+         * Pecah periode.
+         */
         [$tahun, $bulan] = explode(
             '-',
             $periode
         );
 
-
         /*
-        |--------------------------------------------------------------------------
-        | CEK APAKAH SUDAH MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
-
+         * Cek apakah sudah mengambil.
+         */
         $sudahAmbil = PengambilanGula::where(
                 'karyawan_id',
                 $karyawan->id
@@ -500,95 +357,64 @@ class ScanController extends Controller
             )
             ->exists();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUDAH MENGAMBIL
-        |--------------------------------------------------------------------------
-        */
-
         if ($sudahAmbil) {
             return response()->json([
                 'success' => false,
 
                 'status' => 'sudah',
 
-                'message' =>
-                    'Karyawan sudah mengambil gula pada periode tersebut.',
+                'message' => 'Karyawan sudah mengambil gula pada periode tersebut.',
             ], 422);
         }
 
-
         /*
-        |--------------------------------------------------------------------------
-        | SIMPAN DATA PENGAMBILAN
-        |--------------------------------------------------------------------------
-        */
-
+         * Simpan histori pengambilan.
+         */
         $pengambilan = PengambilanGula::create([
-            'karyawan_id' =>
-                $karyawan->id,
+            'karyawan_id' => $karyawan->id,
 
-            'tanggal_ambil' =>
-                now()->toDateString(),
+            'tanggal_ambil' => now()->toDateString(),
 
-            'jumlah_gula' =>
-                $jumlahGula,
+            'jumlah_gula' => $jumlahGula,
         ]);
 
-
         /*
-        |--------------------------------------------------------------------------
-        | RESPONSE BERHASIL
-        |--------------------------------------------------------------------------
-        */
-
+         * Response berhasil.
+         */
         return response()->json([
             'success' => true,
 
             'status' => 'berhasil',
 
-            'message' =>
-                'Pengambilan gula berhasil dikonfirmasi.',
+            'message' => 'Pengambilan gula berhasil dikonfirmasi.',
 
             'karyawan' => [
-                'id' =>
-                    $karyawan->id,
+                'id' => $karyawan->id,
 
-                'nik' =>
-                    $karyawan->nik,
+                'nik' => $karyawan->nik,
 
-                'nama' =>
-                    $karyawan->nama,
+                'nama' => $karyawan->nama,
 
-                'jabatan' =>
-                    $karyawan->jabatan,
+                'jabatan' => $karyawan->jabatan,
 
-                'bagian' =>
-                    $karyawan->bagian,
+                'bagian' => $karyawan->bagian,
 
-                'status' =>
-                    $statusKaryawan,
+                'status' => $statusKaryawan,
 
-                'kategori' =>
-                    $karyawan->kategori,
+                'kategori' => $karyawan->kategori,
             ],
 
-            'periode' =>
-                $periode,
+            'periode' => $periode,
 
-            'jumlah_gula' =>
-                $jumlahGula,
+            'jumlah_gula' => $jumlahGula,
 
-            'satuan' =>
-                'KG',
+            'satuan' => 'KG',
 
-            'tanggal_ambil' =>
-                $pengambilan->tanggal_ambil
-                    ? Carbon::parse(
-                        $pengambilan->tanggal_ambil
-                    )->format('d-m-Y')
-                    : now()->format('d-m-Y'),
+            'tanggal_ambil' => $pengambilan->tanggal_ambil
+                ? Carbon::parse(
+                    $pengambilan->tanggal_ambil
+                )->format('d-m-Y')
+                : now()->format('d-m-Y'),
         ]);
     }
 }

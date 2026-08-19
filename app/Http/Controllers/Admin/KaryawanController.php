@@ -18,70 +18,93 @@ class KaryawanController extends Controller
      */
     public function index(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY KARYAWAN
+        |--------------------------------------------------------------------------
+        */
+
         $query = Karyawan::query();
+
 
         /*
         |--------------------------------------------------------------------------
         | FILTER KATEGORI
         |--------------------------------------------------------------------------
         */
+
         if ($request->filled('kategori')) {
+
             $query->where(
                 'kategori',
                 $request->kategori
             );
         }
 
+
         /*
         |--------------------------------------------------------------------------
         | FILTER STATUS
         |--------------------------------------------------------------------------
         */
+
         if ($request->filled('status')) {
+
             $query->where(
                 'status',
                 $request->status
             );
         }
 
+
         /*
         |--------------------------------------------------------------------------
         | PENCARIAN NAMA / NIK
         |--------------------------------------------------------------------------
         */
+
         if ($request->filled('cari')) {
 
-            $query->where(function ($q) use ($request) {
+            $cari = trim(
+                $request->cari
+            );
+
+            $query->where(function ($q) use ($cari) {
 
                 $q->where(
                     'nama',
                     'like',
-                    '%' . $request->cari . '%'
+                    '%' . $cari . '%'
                 );
 
                 $q->orWhere(
                     'nik',
                     'like',
-                    '%' . $request->cari . '%'
+                    '%' . $cari . '%'
                 );
+
             });
         }
+
 
         /*
         |--------------------------------------------------------------------------
         | DATA KARYAWAN
         |--------------------------------------------------------------------------
         */
+
         $karyawan = $query
             ->orderBy('nama')
             ->paginate(15)
             ->withQueryString();
+
 
         /*
         |--------------------------------------------------------------------------
         | DAFTAR KATEGORI
         |--------------------------------------------------------------------------
         */
+
         $kategoriList = Karyawan::query()
             ->whereNotNull('kategori')
             ->where('kategori', '!=', '')
@@ -89,11 +112,13 @@ class KaryawanController extends Controller
             ->orderBy('kategori')
             ->pluck('kategori');
 
+
         /*
         |--------------------------------------------------------------------------
         | DAFTAR STATUS
         |--------------------------------------------------------------------------
         */
+
         $statusList = Karyawan::query()
             ->whereNotNull('status')
             ->where('status', '!=', '')
@@ -101,11 +126,13 @@ class KaryawanController extends Controller
             ->orderBy('status')
             ->pluck('status');
 
+
         /*
         |--------------------------------------------------------------------------
         | VIEW
         |--------------------------------------------------------------------------
         */
+
         return view(
             'admin.karyawan.index',
             compact(
@@ -137,11 +164,6 @@ class KaryawanController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
         $validated = $request->validate(
             [
                 'nik' => [
@@ -198,18 +220,12 @@ class KaryawanController extends Controller
             ]
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN DATA
-        |--------------------------------------------------------------------------
-        */
-        Karyawan::create($validated);
 
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
+        Karyawan::create(
+            $validated
+        );
+
+
         return redirect()
             ->route('admin.karyawan')
             ->with(
@@ -242,11 +258,6 @@ class KaryawanController extends Controller
         Request $request,
         Karyawan $karyawan
     ) {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
         $validated = $request->validate(
             [
                 'nik' => [
@@ -303,18 +314,12 @@ class KaryawanController extends Controller
             ]
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE
-        |--------------------------------------------------------------------------
-        */
-        $karyawan->update($validated);
 
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
+        $karyawan->update(
+            $validated
+        );
+
+
         return redirect()
             ->route('admin.karyawan')
             ->with(
@@ -331,25 +336,12 @@ class KaryawanController extends Controller
      */
     public function destroy(Karyawan $karyawan)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN NAMA UNTUK PESAN
-        |--------------------------------------------------------------------------
-        */
         $nama = $karyawan->nama;
 
-        /*
-        |--------------------------------------------------------------------------
-        | HAPUS
-        |--------------------------------------------------------------------------
-        */
+
         $karyawan->delete();
 
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
+
         return redirect()
             ->route('admin.karyawan')
             ->with(
@@ -361,16 +353,82 @@ class KaryawanController extends Controller
 
     /**
      * =========================================================
-     * IMPORT DATA KARYAWAN DARI EXCEL
+     * HAPUS BANYAK DATA KARYAWAN SEKALIGUS
+     * =========================================================
+     */
+    public function bulkDestroy(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI
+        |--------------------------------------------------------------------------
+        */
+
+        $validated = $request->validate(
+            [
+                'ids' => [
+                    'required',
+                    'array',
+                    'min:1',
+                ],
+
+                'ids.*' => [
+                    'integer',
+                    'exists:karyawan,id',
+                ],
+            ],
+            [
+                'ids.required' =>
+                    'Pilih minimal satu data karyawan yang ingin dihapus.',
+
+                'ids.min' =>
+                    'Pilih minimal satu data karyawan yang ingin dihapus.',
+
+                'ids.*.exists' =>
+                    'Salah satu data yang dipilih tidak ditemukan.',
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HAPUS DATA TERPILIH
+        |--------------------------------------------------------------------------
+        */
+
+        $jumlah = Karyawan::whereIn(
+            'id',
+            $validated['ids']
+        )->count();
+
+        Karyawan::whereIn(
+            'id',
+            $validated['ids']
+        )->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECT
+        |--------------------------------------------------------------------------
+        */
+
+        return redirect()
+            ->route('admin.karyawan')
+            ->with(
+                'success',
+                "{$jumlah} data karyawan berhasil dihapus."
+            );
+    }
+
+
+    /**
+     * =========================================================
+     * IMPORT DATA KARYAWAN
      * =========================================================
      */
     public function importExcel(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI FILE EXCEL
-        |--------------------------------------------------------------------------
-        */
         $request->validate(
             [
                 'file' => [
@@ -395,46 +453,35 @@ class KaryawanController extends Controller
             ]
         );
 
+
         try {
 
-            /*
-            |--------------------------------------------------------------------------
-            | BUAT OBJECT IMPORT
-            |--------------------------------------------------------------------------
-            */
-            $import = new KaryawanImport();
+            $import =
+                new KaryawanImport();
 
-            /*
-            |--------------------------------------------------------------------------
-            | PROSES IMPORT
-            |--------------------------------------------------------------------------
-            */
+
             Excel::import(
                 $import,
                 $request->file('file')
             );
 
-            /*
-            |--------------------------------------------------------------------------
-            | BUAT PESAN HASIL IMPORT
-            |--------------------------------------------------------------------------
-            */
-            $pesan = 'Import selesai. ';
+
+            $pesan =
+                'Import selesai. ';
+
 
             $pesan .=
                 "Berhasil: {$import->berhasil}. ";
 
+
             $pesan .=
                 "Dilewati: {$import->dilewati}. ";
+
 
             $pesan .=
                 "Gagal: {$import->gagal}.";
 
-            /*
-            |--------------------------------------------------------------------------
-            | REDIRECT BERHASIL
-            |--------------------------------------------------------------------------
-            */
+
             return redirect()
                 ->route('admin.karyawan')
                 ->with(
@@ -444,11 +491,6 @@ class KaryawanController extends Controller
 
         } catch (\Throwable $e) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | REDIRECT JIKA IMPORT GAGAL
-            |--------------------------------------------------------------------------
-            */
             return redirect()
                 ->route('admin.karyawan')
                 ->with(
