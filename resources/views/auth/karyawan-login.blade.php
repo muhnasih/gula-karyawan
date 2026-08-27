@@ -111,11 +111,52 @@
                             >
 
 
+                            @error('nik')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+
                             <small class="text-muted">
 
                                 Masukkan NIK sesuai data karyawan.
 
                             </small>
+
+                        </div>
+
+
+                        {{-- PASSWORD --}}
+
+                        <div class="mb-4">
+
+                            <label
+                                for="password"
+                                class="form-label fw-semibold"
+                            >
+
+                                Password
+
+                            </label>
+
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                placeholder="Masukkan password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
 
                         </div>
 
@@ -141,8 +182,8 @@
                     <div class="text-center mt-4">
 
                         <small class="text-muted d-block mb-2">
-                            Login karyawan menggunakan NIK
-                            tanpa password.
+                            Password awal adalah NIK karyawan.
+                            Silakan ubah password setelah berhasil login.
                         </small>
 
                         <small class="text-muted">

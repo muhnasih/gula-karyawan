@@ -11,19 +11,28 @@
 
     if ($isKaryawan) {
 
-        $sidebarUserName = auth('karyawan')->user()->nama ?? 'Karyawan';
+        $sidebarUserName =
+            auth('karyawan')->user()->nama
+            ?? 'Karyawan';
+
         $sidebarUserRole = 'Karyawan';
-        $sidebarLogoutRoute = route('karyawan.logout');
+
+        $sidebarLogoutRoute =
+            route('karyawan.logout');
 
     } else {
 
-        $sidebarUserName = auth()->user()->nama_lengkap
+        $sidebarUserName =
+            auth()->user()->nama_lengkap
             ?? auth()->user()->username
             ?? '';
 
-        $sidebarUserRole = auth()->user()->role ?? '';
-        $sidebarLogoutRoute = route('logout');
+        $sidebarUserRole =
+            auth()->user()->role
+            ?? '';
 
+        $sidebarLogoutRoute =
+            route('logout');
     }
 @endphp
 
@@ -38,7 +47,6 @@
     <div class="px-3 pt-4 pb-3">
 
         <div class="d-flex align-items-center">
-
 
             {{-- Logo --}}
 
@@ -57,7 +65,9 @@
                     class="text-white fw-bold text-truncate"
                     style="font-size: 0.95rem;"
                 >
+
                     PG GENDING
+
                 </div>
 
 
@@ -68,7 +78,9 @@
                         font-size: 0.68rem;
                     "
                 >
+
                     Sistem Pengambilan Gula
+
                 </div>
 
             </div>
@@ -78,7 +90,6 @@
     </div>
 
 
-
     {{-- =====================================================
         GARIS PEMBATAS
     ====================================================== --}}
@@ -86,12 +97,14 @@
     <div class="sidebar-divider"></div>
 
 
-
     {{-- =====================================================
         MENU
     ====================================================== --}}
 
-    <nav class="flex-grow-1" aria-label="Menu utama">
+    <nav
+        class="flex-grow-1"
+        aria-label="Menu utama"
+    >
 
 
         {{-- =================================================
@@ -110,7 +123,9 @@
                 <div class="nav flex-column">
 
 
-                    {{-- Section --}}
+                    {{-- =================================================
+                        SECTION
+                    ================================================== --}}
 
                     <div
                         class="text-uppercase small opacity-75 mb-2 text-white"
@@ -121,14 +136,15 @@
                             letter-spacing: 0.8px;
                         "
                     >
+
                         Menu Admin
+
                     </div>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         DATA KARYAWAN
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -144,6 +160,7 @@
                     <a
                         href="{{ route('admin.karyawan') }}"
                         class="nav-link mb-1 {{ $isKaryawanMenuActive ? 'active' : '' }}"
+
                         @if($isKaryawanMenuActive)
                             aria-current="page"
                         @endif
@@ -158,10 +175,9 @@
                     </a>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         JATAH GULA
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -174,6 +190,7 @@
                     <a
                         href="{{ route('admin.jatah-gula.index') }}"
                         class="nav-link mb-1 {{ $isJatahGulaMenuActive ? 'active' : '' }}"
+
                         @if($isJatahGulaMenuActive)
                             aria-current="page"
                         @endif
@@ -188,10 +205,9 @@
                     </a>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         LAPORAN
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -204,6 +220,7 @@
                     <a
                         href="{{ route('admin.laporan.index') }}"
                         class="nav-link mb-1 {{ $isLaporanActive ? 'active' : '' }}"
+
                         @if($isLaporanActive)
                             aria-current="page"
                         @endif
@@ -218,10 +235,9 @@
                     </a>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         KELOLA OPERATOR
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -234,6 +250,7 @@
                     <a
                         href="{{ route('admin.operator.index') }}"
                         class="nav-link mb-1 {{ $isOperatorMenuActive ? 'active' : '' }}"
+
                         @if($isOperatorMenuActive)
                             aria-current="page"
                         @endif
@@ -243,6 +260,36 @@
 
                         <span>
                             Kelola Operator
+                        </span>
+
+                    </a>
+
+
+                    {{-- =================================================
+                        PENGATURAN PROFIL
+                    ================================================== --}}
+
+                    @php
+
+                        $isProfileActive =
+                            request()->routeIs('profile.*');
+
+                    @endphp
+
+
+                    <a
+                        href="{{ route('profile.edit') }}"
+                        class="nav-link mb-1 {{ $isProfileActive ? 'active' : '' }}"
+
+                        @if($isProfileActive)
+                            aria-current="page"
+                        @endif
+                    >
+
+                        <i class="bi bi-person-circle"></i>
+
+                        <span>
+                            Pengaturan Profil
                         </span>
 
                     </a>
@@ -263,7 +310,9 @@
                 <div class="nav flex-column">
 
 
-                    {{-- Section --}}
+                    {{-- =================================================
+                        SECTION
+                    ================================================== --}}
 
                     <div
                         class="text-uppercase small opacity-75 mb-2 text-white"
@@ -274,14 +323,15 @@
                             letter-spacing: 0.8px;
                         "
                     >
+
                         Menu Operator
+
                     </div>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         DASHBOARD
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -294,6 +344,7 @@
                     <a
                         href="{{ route('operator.dashboard') }}"
                         class="nav-link mb-1 {{ $isOperatorDashboardActive ? 'active' : '' }}"
+
                         @if($isOperatorDashboardActive)
                             aria-current="page"
                         @endif
@@ -308,10 +359,9 @@
                     </a>
 
 
-
-                    {{-- =========================================
+                    {{-- =================================================
                         STATISTIK
-                    ========================================== --}}
+                    ================================================== --}}
 
                     @php
 
@@ -324,6 +374,7 @@
                     <a
                         href="{{ route('operator.statistik') }}"
                         class="nav-link mb-1 {{ $isOperatorStatistikActive ? 'active' : '' }}"
+
                         @if($isOperatorStatistikActive)
                             aria-current="page"
                         @endif
@@ -333,6 +384,36 @@
 
                         <span>
                             Statistik
+                        </span>
+
+                    </a>
+
+
+                    {{-- =================================================
+                        PENGATURAN PROFIL
+                    ================================================== --}}
+
+                    @php
+
+                        $isProfileActive =
+                            request()->routeIs('profile.*');
+
+                    @endphp
+
+
+                    <a
+                        href="{{ route('profile.edit') }}"
+                        class="nav-link mb-1 {{ $isProfileActive ? 'active' : '' }}"
+
+                        @if($isProfileActive)
+                            aria-current="page"
+                        @endif
+                    >
+
+                        <i class="bi bi-person-circle"></i>
+
+                        <span>
+                            Pengaturan Profil
                         </span>
 
                     </a>
@@ -356,7 +437,9 @@
             <div class="nav flex-column">
 
 
-                {{-- Section --}}
+                {{-- =================================================
+                    SECTION
+                ================================================== --}}
 
                 <div
                     class="text-uppercase small opacity-75 mb-2 text-white"
@@ -367,14 +450,15 @@
                         letter-spacing: 0.8px;
                     "
                 >
+
                     Menu Karyawan
+
                 </div>
 
 
-
-                {{-- =============================================
+                {{-- =================================================
                     DASHBOARD KARYAWAN
-                ============================================== --}}
+                ================================================== --}}
 
                 @php
 
@@ -387,6 +471,7 @@
                 <a
                     href="{{ route('karyawan.dashboard') }}"
                     class="nav-link mb-1 {{ $isKaryawanDashboardActive ? 'active' : '' }}"
+
                     @if($isKaryawanDashboardActive)
                         aria-current="page"
                     @endif
@@ -399,7 +484,13 @@
                     </span>
 
                 </a>
-
+<a
+    href="{{ route('karyawan.password') }}"
+    class="nav-link"
+>
+    <i class="bi bi-shield-lock me-2"></i>
+    <span>Pengaturan Password</span>
+</a>
 
             </div>
 
@@ -419,13 +510,16 @@
         <div class="px-3 pb-4">
 
 
-            {{-- Garis --}}
+            {{-- =================================================
+                GARIS
+            ================================================== --}}
 
             <div class="sidebar-divider--footer"></div>
 
 
-
-            {{-- Kartu User --}}
+            {{-- =================================================
+                KARTU USER
+            ================================================== --}}
 
             <div class="sidebar-user-card">
 
@@ -437,7 +531,6 @@
                     <i class="bi bi-person-fill"></i>
 
                 </div>
-
 
 
                 {{-- Nama + Role --}}
@@ -463,8 +556,9 @@
             </div>
 
 
-
-            {{-- Logout --}}
+            {{-- =================================================
+                LOGOUT
+            ================================================== --}}
 
             <form
                 method="POST"

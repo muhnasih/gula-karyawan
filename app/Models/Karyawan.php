@@ -24,6 +24,7 @@ class Karyawan extends Model implements AuthenticatableContract
         'status_pengambilan',
         'tanggal_pengambilan',
         'discan_oleh',
+        'password',
     ];
 
     protected $casts = [
@@ -91,5 +92,10 @@ class Karyawan extends Model implements AuthenticatableContract
     public function pengambilanGula()
 {
     return $this->hasMany(PengambilanGula::class, 'karyawan_id');
+
 }
+
+   protected $hidden = [
+    'password',
+];
 }

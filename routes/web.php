@@ -24,6 +24,7 @@ use App\Http\Controllers\Operator\OperatorStatistikController;
 // =========================================================
 use App\Http\Controllers\Karyawan\AuthController as KaryawanAuthController;
 use App\Http\Controllers\Karyawan\DashboardController as KaryawanDashboardController;
+use App\Http\Controllers\Karyawan\ProfileController as KaryawanProfileController;
 
 
 /*
@@ -98,7 +99,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PROFILE
+    | PROFILE (ADMIN & OPERATOR)
     |--------------------------------------------------------------------------
     */
 
@@ -108,8 +109,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
 
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.password.update');
+
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FOTO PROFIL (ADMIN & OPERATOR)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/profile/foto', [ProfileController::class, 'editFoto'])
+        ->name('profile.foto');
+
+    Route::post('/profile/foto', [ProfileController::class, 'updateFoto'])
+        ->name('profile.foto.update');
 
 
     /*
@@ -397,6 +414,18 @@ Route::middleware('auth:karyawan')->group(function () {
     Route::get('/karyawan/dashboard', [KaryawanDashboardController::class, 'index'])
         ->name('karyawan.dashboard');
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT PASSWORD KARYAWAN
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/karyawan/password', [KaryawanProfileController::class, 'password'])
+    ->name('karyawan.password');
+
+Route::put('/karyawan/password', [KaryawanProfileController::class, 'updatePassword'])
+    ->name('karyawan.password.update');
 
     /*
     |--------------------------------------------------------------------------
