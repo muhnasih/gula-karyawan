@@ -11,6 +11,10 @@
 
     if ($isKaryawan) {
 
+        // =====================================================
+        // USER KARYAWAN
+        // =====================================================
+
         $sidebarUserName =
             auth('karyawan')->user()->nama
             ?? 'Karyawan';
@@ -22,10 +26,14 @@
 
     } else {
 
+        // =====================================================
+        // USER ADMIN / OPERATOR
+        // =====================================================
+
         $sidebarUserName =
             auth()->user()->nama_lengkap
             ?? auth()->user()->username
-            ?? '';
+            ?? 'Pengguna';
 
         $sidebarUserRole =
             auth()->user()->role
@@ -48,38 +56,42 @@
 
         <div class="d-flex align-items-center">
 
-            {{-- Logo --}}
 
-            <div class="sidebar-logo-icon">
+            {{-- =================================================
+                LOGO
+            ================================================== --}}
 
-                <i class="bi bi-buildings-fill fs-4"></i>
+            <div class="d-flex align-items-center overflow-hidden">
 
-            </div>
+                <div class="sidebar-logo-icon">
 
-
-            {{-- Judul --}}
-
-            <div class="ms-3 overflow-hidden">
-
-                <div
-                    class="text-white fw-bold text-truncate"
-                    style="font-size: 0.95rem;"
-                >
-
-                    PG GENDING
+                    <i class="bi bi-buildings-fill fs-4"></i>
 
                 </div>
 
 
-                <div
-                    class="text-truncate"
-                    style="
-                        color: rgba(255,255,255,0.65);
-                        font-size: 0.68rem;
-                    "
-                >
+                {{-- =================================================
+                    JUDUL
+                ================================================== --}}
 
-                    Sistem Pengambilan Gula
+                <div class="ms-3 overflow-hidden">
+
+                    <div
+                        class="text-white fw-bold text-truncate"
+                        style="font-size: 0.95rem;"
+                    >
+                        PG GENDING
+                    </div>
+
+                    <div
+                        class="text-truncate"
+                        style="
+                            color: rgba(255,255,255,0.65);
+                            font-size: 0.68rem;
+                        "
+                    >
+                        Sistem Pengambilan Gula
+                    </div>
 
                 </div>
 
@@ -136,9 +148,7 @@
                             letter-spacing: 0.8px;
                         "
                     >
-
                         Menu Admin
-
                     </div>
 
 
@@ -147,13 +157,11 @@
                     ================================================== --}}
 
                     @php
-
                         $isKaryawanMenuActive =
                             request()->routeIs('admin.karyawan')
                             || request()->routeIs('admin.karyawan.show')
                             || request()->routeIs('admin.karyawan.create')
                             || request()->routeIs('admin.karyawan.edit');
-
                     @endphp
 
 
@@ -180,10 +188,8 @@
                     ================================================== --}}
 
                     @php
-
                         $isJatahGulaMenuActive =
                             request()->routeIs('admin.jatah-gula.*');
-
                     @endphp
 
 
@@ -210,10 +216,8 @@
                     ================================================== --}}
 
                     @php
-
                         $isLaporanActive =
                             request()->routeIs('admin.laporan.*');
-
                     @endphp
 
 
@@ -240,10 +244,8 @@
                     ================================================== --}}
 
                     @php
-
                         $isOperatorMenuActive =
                             request()->routeIs('admin.operator.*');
-
                     @endphp
 
 
@@ -265,40 +267,9 @@
                     </a>
 
 
-                    {{-- =================================================
-                        PENGATURAN PROFIL
-                    ================================================== --}}
-
-                    @php
-
-                        $isProfileActive =
-                            request()->routeIs('profile.*');
-
-                    @endphp
-
-
-                    <a
-                        href="{{ route('profile.edit') }}"
-                        class="nav-link mb-1 {{ $isProfileActive ? 'active' : '' }}"
-
-                        @if($isProfileActive)
-                            aria-current="page"
-                        @endif
-                    >
-
-                        <i class="bi bi-person-circle"></i>
-
-                        <span>
-                            Pengaturan Profil
-                        </span>
-
-                    </a>
-
-
                 </div>
 
             @endif
-
 
 
             {{-- =================================================
@@ -323,9 +294,7 @@
                             letter-spacing: 0.8px;
                         "
                     >
-
                         Menu Operator
-
                     </div>
 
 
@@ -334,10 +303,8 @@
                     ================================================== --}}
 
                     @php
-
                         $isOperatorDashboardActive =
                             request()->routeIs('operator.dashboard');
-
                     @endphp
 
 
@@ -364,10 +331,8 @@
                     ================================================== --}}
 
                     @php
-
                         $isOperatorStatistikActive =
                             request()->routeIs('operator.statistik');
-
                     @endphp
 
 
@@ -389,43 +354,12 @@
                     </a>
 
 
-                    {{-- =================================================
-                        PENGATURAN PROFIL
-                    ================================================== --}}
-
-                    @php
-
-                        $isProfileActive =
-                            request()->routeIs('profile.*');
-
-                    @endphp
-
-
-                    <a
-                        href="{{ route('profile.edit') }}"
-                        class="nav-link mb-1 {{ $isProfileActive ? 'active' : '' }}"
-
-                        @if($isProfileActive)
-                            aria-current="page"
-                        @endif
-                    >
-
-                        <i class="bi bi-person-circle"></i>
-
-                        <span>
-                            Pengaturan Profil
-                        </span>
-
-                    </a>
-
-
                 </div>
 
             @endif
 
 
         @endauth
-
 
 
         {{-- =================================================
@@ -450,9 +384,7 @@
                         letter-spacing: 0.8px;
                     "
                 >
-
                     Menu Karyawan
-
                 </div>
 
 
@@ -461,10 +393,8 @@
                 ================================================== --}}
 
                 @php
-
                     $isKaryawanDashboardActive =
                         request()->routeIs('karyawan.dashboard');
-
                 @endphp
 
 
@@ -484,13 +414,35 @@
                     </span>
 
                 </a>
-<a
-    href="{{ route('karyawan.password') }}"
-    class="nav-link"
->
-    <i class="bi bi-shield-lock me-2"></i>
-    <span>Pengaturan Password</span>
-</a>
+
+
+                {{-- =================================================
+                    PENGATURAN PASSWORD KARYAWAN
+                ================================================== --}}
+
+                @php
+                    $isKaryawanPasswordActive =
+                        request()->routeIs('karyawan.password');
+                @endphp
+
+
+                <a
+                    href="{{ route('karyawan.password') }}"
+                    class="nav-link mb-1 {{ $isKaryawanPasswordActive ? 'active' : '' }}"
+
+                    @if($isKaryawanPasswordActive)
+                        aria-current="page"
+                    @endif
+                >
+
+                    <i class="bi bi-shield-lock"></i>
+
+                    <span>
+                        Pengaturan Password
+                    </span>
+
+                </a>
+
 
             </div>
 
@@ -498,7 +450,6 @@
 
 
     </nav>
-
 
 
     {{-- =====================================================
@@ -524,7 +475,9 @@
             <div class="sidebar-user-card">
 
 
-                {{-- Avatar --}}
+                {{-- =================================================
+                    AVATAR
+                ================================================== --}}
 
                 <div class="sidebar-avatar">
 
@@ -533,7 +486,9 @@
                 </div>
 
 
-                {{-- Nama + Role --}}
+                {{-- =================================================
+                    NAMA + ROLE
+                ================================================== --}}
 
                 <div class="ms-2 overflow-hidden">
 

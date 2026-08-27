@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+
+    .sidebar-profile-icon-btn {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .sidebar-profile-icon-btn:hover {
+        background-color: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+    .sidebar-profile-icon-btn.active {
+        background-color: rgba(255, 255, 255, 0.18);
+        color: #fff;
+    }
+
+}
