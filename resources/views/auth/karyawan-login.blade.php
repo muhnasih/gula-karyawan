@@ -1,208 +1,91 @@
-@extends('layouts.app')
-
-@section('title', 'Login Karyawan')
-
-@section('content')
-
-<div class="container py-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-5">
-
-            <div class="card border-0 shadow">
-
-                <div class="card-body p-4">
-
-                    {{-- HEADER --}}
-
-                    <div class="text-center mb-4">
-
-                        <div
-                            class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle bg-success text-white"
-                            style="width: 75px; height: 75px;"
-                        >
-
-                            <i class="bi bi-person-badge fs-1"></i>
-
-                        </div>
-
-
-                        <h3 class="fw-bold">
-                            Login Karyawan
-                        </h3>
-
-
-                        <p class="text-muted mb-0">
-                            Sistem Pengambilan Gula Karyawan
-                        </p>
-
-                    </div>
-
-
-                    {{-- ERROR SESSION --}}
-
-                    @if(session('error'))
-
-                        <div class="alert alert-danger">
-
-                            <i class="bi bi-exclamation-circle me-1"></i>
-
-                            {{ session('error') }}
-
-                        </div>
-
-                    @endif
-
-
-                    {{-- ERROR VALIDASI --}}
-
-                    @if($errors->any())
-
-                        <div class="alert alert-danger">
-
-                            @foreach($errors->all() as $error)
-
-                                <div>
-                                    {{ $error }}
-                                </div>
-
-                            @endforeach
-
-                        </div>
-
-                    @endif
-
-
-                    {{-- FORM LOGIN --}}
-
-                    <form
-                        action="{{ route('karyawan.login.store') }}"
-                        method="POST"
-                    >
-
-                        @csrf
-
-
-                        {{-- NIK --}}
-
-                        <div class="mb-4">
-
-                            <label
-                                for="nik"
-                                class="form-label fw-semibold"
-                            >
-
-                                NIK Karyawan
-
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="nik"
-                                name="nik"
-                                class="form-control form-control-lg @error('nik') is-invalid @enderror"
-                                value="{{ old('nik') }}"
-                                placeholder="Masukkan NIK"
-                                autocomplete="off"
-                                autofocus
-                                required
-                            >
-
-
-                            @error('nik')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-
-                            <small class="text-muted">
-
-                                Masukkan NIK sesuai data karyawan.
-
-                            </small>
-
-                        </div>
-
-
-                        {{-- PASSWORD --}}
-
-                        <div class="mb-4">
-
-                            <label
-                                for="password"
-                                class="form-label fw-semibold"
-                            >
-
-                                Password
-
-                            </label>
-
-
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                class="form-control form-control-lg @error('password') is-invalid @enderror"
-                                placeholder="Masukkan password"
-                                autocomplete="current-password"
-                                required
-                            >
-
-
-                            @error('password')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- TOMBOL MASUK --}}
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg w-100"
-                        >
-
-                            <i class="bi bi-box-arrow-in-right me-1"></i>
-
-                            Masuk
-
-                        </button>
-
-                    </form>
-
-
-                    {{-- INFORMASI --}}
-
-                    <div class="text-center mt-4">
-
-                        <small class="text-muted d-block mb-2">
-                            Password awal adalah NIK karyawan.
-                            Silakan ubah password setelah berhasil login.
-                        </small>
-
-                        <small class="text-muted">
-                            Login sebagai admin / operator?
-                            <a href="{{ route('login') }}" class="text-success fw-semibold text-decoration-none">
-                                Klik di sini
-                            </a>
-                        </small>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+<x-guest-layout>
+
+    {{-- ERROR SESSION --}}
+    @if(session('error'))
+        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 flex items-start gap-2">
+            <i class="bi bi-exclamation-circle mt-0.5"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
+    {{-- ERROR VALIDASI --}}
+    @if($errors->any())
+        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            @foreach($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
+    @endif
+
+    {{-- FORM LOGIN --}}
+    <form action="{{ route('karyawan.login.store') }}" method="POST" class="space-y-5">
+        @csrf
+
+        {{-- NIK --}}
+        <div>
+            <label for="nik" class="block mb-1.5 text-sm font-semibold text-gray-700">
+                NIK Karyawan
+            </label>
+            <input
+                type="text"
+                id="nik"
+                name="nik"
+                value="{{ old('nik') }}"
+                placeholder="Masukkan NIK"
+                autocomplete="off"
+                autofocus
+                required
+                class="w-full rounded-lg border px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                       {{ $errors->has('nik') ? 'border-red-400' : 'border-gray-300' }}"
+            >
+            @error('nik')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-400">Masukkan NIK sesuai data karyawan.</p>
         </div>
 
+        {{-- PASSWORD --}}
+        <div>
+            <label for="password" class="block mb-1.5 text-sm font-semibold text-gray-700">
+                Password
+            </label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Masukkan password"
+                autocomplete="current-password"
+                required
+                class="w-full rounded-lg border px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                       {{ $errors->has('password') ? 'border-red-400' : 'border-gray-300' }}"
+            >
+            @error('password')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- TOMBOL MASUK --}}
+        <button
+            type="submit"
+            class="w-full flex items-center justify-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 transition text-white font-semibold py-2.5 text-sm shadow-md shadow-green-600/20"
+        >
+            <i class="bi bi-box-arrow-in-right"></i>
+            Masuk
+        </button>
+    </form>
+
+    {{-- INFORMASI --}}
+    <div class="text-center mt-6 space-y-2">
+        <p class="text-xs text-gray-400">
+            Password awal adalah NIK karyawan.
+            Silakan ubah password setelah berhasil login.
+        </p>
+        <p class="text-xs text-gray-500">
+            Login sebagai admin / operator?
+            <a href="{{ route('login') }}" class="text-green-600 font-semibold hover:underline">
+                Klik di sini
+            </a>
+        </p>
     </div>
 
-</div>
-
-@endsection
+</x-guest-layout>

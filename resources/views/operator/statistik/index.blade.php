@@ -6,7 +6,9 @@
 
 <style>
     /* =========================================================
-       OPERATOR STATISTIK - CLEAN MODERN (Improved)
+       OPERATOR STATISTIK - CLEAN MODERN (Improved & Responsive)
+       Responsif untuk SEMUA perangkat mobile (Android & iOS)
+       berbasis lebar layar (viewport width), bukan device spesifik.
     ========================================================= */
 
     .operator-statistik {
@@ -302,6 +304,9 @@
         font-size: .78rem;
         outline: none;
         transition: .2s ease;
+        /* Mencegah zoom otomatis di Safari iOS saat fokus input */
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .filter-control:focus {
@@ -396,6 +401,7 @@
     .data-list-scroll {
         max-height: 420px;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .data-list-scroll::-webkit-scrollbar {
@@ -515,6 +521,7 @@
         height: 5px;
         border-radius: 50%;
         background: currentColor;
+        flex-shrink: 0;
     }
 
     .status-badge.warning {
@@ -611,6 +618,7 @@
     .pagination-wrap .pagination {
         margin: 0;
         display: flex;
+        flex-wrap: wrap;
         gap: 5px;
         list-style: none;
         padding: 0;
@@ -651,7 +659,8 @@
     }
 
     /* =========================================================
-       RESPONSIVE TABLET
+       RESPONSIVE TABLET (≤1000px)
+       Berlaku untuk tablet Android, iPad, dsb.
     ========================================================= */
 
     @media (max-width: 1000px) {
@@ -670,7 +679,9 @@
     }
 
     /* =========================================================
-       RESPONSIVE MOBILE
+       RESPONSIVE MOBILE UMUM (≤650px)
+       Mencakup HP besar (Android & iPhone Plus/Max/Pro Max)
+       hingga HP menengah (iPhone standar, Android mid-range).
     ========================================================= */
 
     @media (max-width: 650px) {
@@ -725,6 +736,7 @@
 
         .dashboard-card-header {
             padding: 14px;
+            flex-wrap: wrap;
         }
 
         .dashboard-card-body {
@@ -768,12 +780,21 @@
             max-height: 380px;
         }
 
+        /* -----------------------------------------------------
+           FIX UTAMA: cegah badge status/kg menimpa nama & NIK.
+           Berlaku untuk SEMUA HP (Android & iOS) di lebar ≤650px,
+           bukan hanya model tertentu, karena berbasis viewport.
+        ------------------------------------------------------ */
         .data-item {
+            flex-wrap: wrap;
+            align-items: flex-start;
+            row-gap: 6px;
             gap: 8px;
             padding: 10px;
         }
 
         .data-number {
+            order: 1;
             width: 24px;
             height: 24px;
             min-width: 24px;
@@ -781,21 +802,47 @@
         }
 
         .data-avatar {
+            order: 2;
             width: 32px;
             height: 32px;
             min-width: 32px;
             font-size: .65rem;
         }
 
+        .data-content {
+            order: 3;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
         .data-name {
             font-size: .7rem;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+            line-height: 1.35;
+            word-break: break-word;
         }
 
         .data-meta {
             font-size: .59rem;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+            line-height: 1.35;
+            word-break: break-word;
         }
 
-        /* Status badge tetap muncul, hanya diperkecil */
+        .data-right {
+            order: 4;
+            flex: 1 1 100%;
+            width: 100%;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            margin-top: 2px;
+            gap: 6px;
+        }
+
         .status-badge {
             font-size: .55rem;
             padding: 4px 6px;
@@ -823,7 +870,9 @@
     }
 
     /* =========================================================
-       SMALL MOBILE
+       RESPONSIVE MOBILE KECIL (≤480px)
+       HP dengan layar sempit: Android compact, iPhone SE/Mini,
+       serta lebar landscape sempit lainnya.
     ========================================================= */
 
     @media (max-width: 480px) {
@@ -850,11 +899,14 @@
         }
 
         .data-right {
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
+            justify-content: flex-end;
         }
     }
+
+    /* =========================================================
+       RESPONSIVE MOBILE SANGAT SEMPIT (≤390px)
+       HP layar sangat kecil, berbagai merk Android & iPhone.
+    ========================================================= */
 
     @media (max-width: 390px) {
         .operator-statistik .dashboard-container {
