@@ -30,13 +30,18 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Riwayat pengambilan terbaru
+        | Riwayat pengambilan bulan berjalan
         |--------------------------------------------------------------------------
+        | Hanya menampilkan riwayat pada bulan & tahun saat ini.
+        | Data bulan sebelumnya TIDAK dihapus dari database, hanya tidak
+        | ditampilkan di dashboard operator supaya riwayat tidak menumpuk.
+        | Begitu masuk bulan baru, daftar ini otomatis "kosong lagi".
         */
 
         $riwayat = PengambilanGula::with('karyawan')
+            ->whereYear('tanggal_ambil', $tahun)
+            ->whereMonth('tanggal_ambil', $bulan)
             ->latest('tanggal_ambil')
-            ->take(10)
             ->get()
             ->map(function ($item) {
                 return (object) [
@@ -50,11 +55,15 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Label periode untuk ditampilkan di view, contoh: "September 2026"
+        $periodeRiwayat = Carbon::now()->translatedFormat('F Y');
+
         return view('operator.dashboard', compact(
             'totalKaryawan',
             'sudahAmbil',
             'belumAmbil',
-            'riwayat'
+            'riwayat',
+            'periodeRiwayat'
         ));
     }
 }

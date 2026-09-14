@@ -12,6 +12,16 @@
     .operator-card { border: 0; border-radius: 16px; overflow: hidden; }
     .operator-card .card-body { padding: 1.25rem; }
     .card-title-operator { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .card-title-operator .periode-badge {
+        margin-left: auto;
+        font-size: .7rem;
+        font-weight: 700;
+        color: #198754;
+        background: #edf9f2;
+        padding: 4px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
 
     /* Scanner */
     .scanner-wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
@@ -383,6 +393,9 @@
                     <div class="card-title-operator">
                         <i class="bi bi-clock-history text-success"></i>
                         Riwayat Pengambilan
+                        @if(!empty($periodeRiwayat))
+                            <span class="periode-badge">{{ $periodeRiwayat }}</span>
+                        @endif
                     </div>
 
                     <div class="history-list">
@@ -424,7 +437,7 @@
                                     </div>
                                     <div class="history-empty-title">Belum ada data</div>
                                     <div class="history-empty-desc">
-                                        Riwayat pengambilan akan muncul di sini setelah scan berhasil.
+                                        Riwayat pengambilan bulan ini akan muncul di sini setelah scan berhasil.
                                     </div>
                                 </div>
                             @endforelse
