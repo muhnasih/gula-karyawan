@@ -138,7 +138,7 @@
 
                 <thead>
                     <tr>
-                        <th class="ps-4">#</th>
+                        <th class="ps-4">No</th>
                         <th>Operator</th>
                         <th>Username</th>
                         <th>Email</th>
