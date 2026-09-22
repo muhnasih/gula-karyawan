@@ -180,15 +180,12 @@
 
             </div>
 
-
             <x-input-error
                 :messages="$errors->get('password')"
                 class="mt-2"
             />
 
         </div>
-
-
 
         <!-- Remember Me + Forgot Password -->
         <div
@@ -241,8 +238,6 @@
 
         </div>
 
-
-
         <!-- Login Button -->
         <div class="mt-7">
 
@@ -280,8 +275,7 @@
             </button>
 
         </div>
-
-
+        
         <!-- Link ke Login Karyawan -->
         <div class="mt-5 text-center">
 
