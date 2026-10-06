@@ -389,7 +389,7 @@ Route::middleware('guest:karyawan')->group(function () {
 
     Route::get('/karyawan/login', [KaryawanAuthController::class, 'showLoginForm'])
         ->name('karyawan.login');
-
+     
     Route::post('/karyawan/login', [KaryawanAuthController::class, 'login'])
         ->name('karyawan.login.store');
 

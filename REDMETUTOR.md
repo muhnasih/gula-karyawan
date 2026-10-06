@@ -12,4 +12,4 @@ Konfigurasi .env production
 Jalankan Laravel dengan Nginx
 Pasang Cloudflare Tunnel
 Tes dari HP/laptop jaringan lain
-Membuat Laravel otomatis berjalan setelah server restar
+Membuat Laravel otomatis berjalan setelah server restart
