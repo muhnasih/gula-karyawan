@@ -4,1159 +4,781 @@
 
 <div class="container-fluid px-3 px-md-4 px-lg-5 py-4">
 
-    {{-- HEADER --}}
-    <div class="operator-header mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <div class="page-icon">
-                    <i class="bi bi-person-gear"></i>
-                </div>
-                <span class="page-label">MANAJEMEN PENGGUNA</span>
+    {{-- ================= HEADER ================= --}}
+    <div class="op-header mb-4">
+        <div class="op-header-left">
+            <div class="op-badge">
+                <i class="bi bi-person-gear"></i>
+                <span>MANAJEMEN PENGGUNA</span>
             </div>
-
-            <h1 class="page-title mb-1">Daftar Operator</h1>
-
-            <p class="page-description mb-0">
+            <h1 class="op-title">Daftar Operator</h1>
+            <p class="op-desc">
                 Kelola akun operator yang memiliki akses ke sistem pengambilan gula.
             </p>
         </div>
 
-        <a href="{{ route('admin.operator.create') }}"
-           class="btn btn-add-operator">
+        <a href="{{ route('admin.operator.create') }}" class="btn-op-add">
             <i class="bi bi-plus-lg"></i>
             <span>Tambah Operator</span>
         </a>
     </div>
 
 
-    {{-- SUCCESS ALERT --}}
+    {{-- ================= SUCCESS ALERT ================= --}}
     @if (session('success'))
-        <div class="success-alert mb-4">
-            <div class="success-icon">
+        <div class="op-alert success mb-4">
+            <div class="op-alert-icon">
                 <i class="bi bi-check-lg"></i>
             </div>
-
             <div>
-                <div class="success-title">Berhasil</div>
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
+                <div class="op-alert-title">Berhasil</div>
+                <div class="op-alert-msg">{{ session('success') }}</div>
             </div>
         </div>
     @endif
 
 
-    {{-- SUMMARY --}}
+    {{-- ================= SUMMARY ================= --}}
     @php
-        $totalOperator = $users->count();
-        $operatorAktif = $users->where('status', 'aktif')->count();
+        $totalOperator   = $users->count();
+        $operatorAktif   = $users->where('status', 'aktif')->count();
         $operatorNonaktif = $users->where('status', '!=', 'aktif')->count();
     @endphp
 
     <div class="row g-3 mb-4">
-
-        {{-- TOTAL --}}
         <div class="col-12 col-md-4">
-            <div class="summary-card">
-                <div class="summary-icon summary-icon-blue">
-                    <i class="bi bi-people"></i>
+            <div class="op-stat">
+                <div class="op-stat-icon blue">
+                    <i class="bi bi-people-fill"></i>
                 </div>
-
                 <div>
-                    <div class="summary-label">Total Operator</div>
-                    <div class="summary-value">{{ $totalOperator }}</div>
+                    <div class="op-stat-label">Total Operator</div>
+                    <div class="op-stat-value">{{ $totalOperator }}</div>
                 </div>
             </div>
         </div>
 
-        {{-- AKTIF --}}
         <div class="col-12 col-md-4">
-            <div class="summary-card">
-                <div class="summary-icon summary-icon-green">
-                    <i class="bi bi-person-check"></i>
+            <div class="op-stat">
+                <div class="op-stat-icon green">
+                    <i class="bi bi-person-check-fill"></i>
                 </div>
-
                 <div>
-                    <div class="summary-label">Operator Aktif</div>
-                    <div class="summary-value">{{ $operatorAktif }}</div>
+                    <div class="op-stat-label">Operator Aktif</div>
+                    <div class="op-stat-value">{{ $operatorAktif }}</div>
                 </div>
-
-                <div class="summary-status">
-                    Aktif
-                </div>
+                <span class="op-stat-badge green">Aktif</span>
             </div>
         </div>
 
-        {{-- NONAKTIF --}}
         <div class="col-12 col-md-4">
-            <div class="summary-card">
-                <div class="summary-icon summary-icon-gray">
-                    <i class="bi bi-person-x"></i>
+            <div class="op-stat">
+                <div class="op-stat-icon gray">
+                    <i class="bi bi-person-x-fill"></i>
                 </div>
-
                 <div>
-                    <div class="summary-label">Nonaktif</div>
-                    <div class="summary-value">{{ $operatorNonaktif }}</div>
+                    <div class="op-stat-label">Nonaktif</div>
+                    <div class="op-stat-value">{{ $operatorNonaktif }}</div>
                 </div>
-
-                <div class="summary-status summary-status-gray">
-                    Nonaktif
-                </div>
+                <span class="op-stat-badge gray">Nonaktif</span>
             </div>
         </div>
-
     </div>
 
 
-    {{-- OPERATOR TABLE --}}
-    <div class="operator-wrapper">
+    {{-- ================= MAIN CARD ================= --}}
+    <div class="op-card">
 
-        {{-- TABLE HEADER --}}
-        <div class="operator-wrapper-header">
-
+        <div class="op-card-header">
             <div>
-                <h5 class="operator-title mb-1">
-                    Data Operator
-                </h5>
-
-                <p class="operator-subtitle mb-0">
-                    Daftar akun operator yang terdaftar dalam sistem
-                </p>
+                <h5 class="op-card-title">Data Operator</h5>
+                <p class="op-card-sub">Daftar akun operator yang terdaftar dalam sistem</p>
             </div>
-
-            <div class="operator-count">
-                {{ $totalOperator }} Operator
-            </div>
-
+            <div class="op-count">{{ $totalOperator }} Operator</div>
         </div>
 
 
-        {{-- DESKTOP --}}
+        {{-- DESKTOP TABLE --}}
         <div class="table-responsive d-none d-md-block">
-
-            <table class="table operator-table align-middle mb-0">
-
+            <table class="table op-table align-middle mb-0">
                 <thead>
                     <tr>
-                        <th class="ps-4">No</th>
+                        <th class="ps-4" style="width:60px">No</th>
                         <th>Operator</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Status</th>
-                        <th class="text-end pe-4">Aksi</th>
+                        <th class="text-end pe-4" style="width:120px">Aksi</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     @forelse ($users as $user)
-
                         <tr>
-
-                            {{-- NUMBER --}}
                             <td class="ps-4">
-                                <span class="row-number">
-                                    {{ $loop->iteration }}
-                                </span>
+                                <span class="op-no">{{ $loop->iteration }}</span>
                             </td>
 
-
-                            {{-- OPERATOR --}}
                             <td>
-
-                                <div class="operator-info">
-
-                                    <div class="operator-avatar">
+                                <div class="op-user">
+                                    <div class="op-avatar">
                                         {{ strtoupper(substr($user->nama_lengkap, 0, 1)) }}
                                     </div>
-
                                     <div>
-                                        <div class="operator-name">
-                                            {{ $user->nama_lengkap }}
-                                        </div>
-
-                                        <div class="operator-role">
-                                            Operator Sistem
-                                        </div>
+                                        <div class="op-name">{{ $user->nama_lengkap }}</div>
+                                        <div class="op-role">Operator Sistem</div>
                                     </div>
-
                                 </div>
-
                             </td>
 
-
-                            {{-- USERNAME --}}
                             <td>
-                                <span class="username">
-                                    <i class="bi bi-person me-1"></i>
+                                <span class="op-username">
+                                    <i class="bi bi-person"></i>
                                     {{ $user->username }}
                                 </span>
                             </td>
 
-
-                            {{-- EMAIL --}}
                             <td>
-                                <div class="email-text">
-                                    <i class="bi bi-envelope me-2"></i>
+                                <div class="op-email">
+                                    <i class="bi bi-envelope"></i>
                                     {{ $user->email }}
                                 </div>
                             </td>
 
-
-                            {{-- STATUS --}}
                             <td>
-
                                 @if ($user->status === 'aktif')
-
-                                    <span class="status status-active">
-                                        <span class="status-indicator"></span>
-                                        Aktif
+                                    <span class="op-status active">
+                                        <span class="dot"></span> Aktif
                                     </span>
-
                                 @else
-
-                                    <span class="status status-inactive">
-                                        <span class="status-indicator"></span>
-                                        Nonaktif
+                                    <span class="op-status inactive">
+                                        <span class="dot"></span> Nonaktif
                                     </span>
-
                                 @endif
-
                             </td>
 
-
-                            {{-- ACTION --}}
                             <td class="text-end pe-4">
-
-                                <div class="action-buttons">
-
+                                <div class="op-actions">
                                     <a href="{{ route('admin.operator.edit', $user->id) }}"
-                                       class="action-btn action-edit"
-                                       title="Edit operator">
-
+                                       class="op-btn edit"
+                                       title="Edit">
                                         <i class="bi bi-pencil"></i>
-
                                     </a>
-
 
                                     <form action="{{ route('admin.operator.destroy', $user->id) }}"
                                           method="POST"
                                           class="d-inline"
                                           onsubmit="return confirm('Yakin ingin menghapus operator ini?');">
-
                                         @csrf
                                         @method('DELETE')
-
-                                        <button type="submit"
-                                                class="action-btn action-delete"
-                                                title="Hapus operator">
-
+                                        <button type="submit" class="op-btn delete" title="Hapus">
                                             <i class="bi bi-trash3"></i>
-
                                         </button>
-
                                     </form>
-
                                 </div>
-
                             </td>
-
                         </tr>
-
                     @empty
-
                         <tr>
-
                             <td colspan="6" class="border-0 p-0">
-
                                 @include('admin.operator._empty')
-
                             </td>
-
                         </tr>
-
                     @endforelse
-
                 </tbody>
-
             </table>
-
         </div>
 
 
-        {{-- MOBILE --}}
-        <div class="d-block d-md-none mobile-operator-list">
-
+        {{-- MOBILE LIST --}}
+        <div class="d-block d-md-none op-mobile">
             @forelse ($users as $user)
-
-                <div class="mobile-operator-card">
-
-                    <div class="mobile-top">
-
-                        <div class="operator-info">
-
-                            <div class="operator-avatar">
+                <div class="op-m-card">
+                    <div class="op-m-top">
+                        <div class="op-user">
+                            <div class="op-avatar">
                                 {{ strtoupper(substr($user->nama_lengkap, 0, 1)) }}
                             </div>
-
                             <div>
-
-                                <div class="operator-name">
-                                    {{ $user->nama_lengkap }}
-                                </div>
-
-                                <div class="operator-role">
-                                    @ {{ $user->username }}
-                                </div>
-
+                                <div class="op-name">{{ $user->nama_lengkap }}</div>
+                                <div class="op-role">@ {{ $user->username }}</div>
                             </div>
-
                         </div>
 
-
                         @if ($user->status === 'aktif')
-
-                            <span class="status status-active">
-                                <span class="status-indicator"></span>
-                                Aktif
+                            <span class="op-status active">
+                                <span class="dot"></span> Aktif
                             </span>
-
                         @else
-
-                            <span class="status status-inactive">
-                                <span class="status-indicator"></span>
-                                Nonaktif
+                            <span class="op-status inactive">
+                                <span class="dot"></span> Nonaktif
                             </span>
-
                         @endif
-
                     </div>
 
-
-                    <div class="mobile-email">
-
+                    <div class="op-m-email">
                         <i class="bi bi-envelope"></i>
-
-                        <span>
-                            {{ $user->email }}
-                        </span>
-
+                        <span>{{ $user->email }}</span>
                     </div>
 
-
-                    <div class="mobile-actions">
-
-                        <a href="{{ route('admin.operator.edit', $user->id) }}"
-                           class="mobile-action mobile-edit">
-
-                            <i class="bi bi-pencil-square"></i>
-                            Edit
-
+                    <div class="op-m-actions">
+                        <a href="{{ route('admin.operator.edit', $user->id) }}" class="op-m-btn edit">
+                            <i class="bi bi-pencil-square"></i> Edit
                         </a>
-
 
                         <form action="{{ route('admin.operator.destroy', $user->id) }}"
                               method="POST"
                               class="flex-fill"
                               onsubmit="return confirm('Yakin ingin menghapus operator ini?');">
-
                             @csrf
                             @method('DELETE')
-
-                            <button type="submit"
-                                    class="mobile-action mobile-delete w-100">
-
-                                <i class="bi bi-trash3"></i>
-                                Hapus
-
+                            <button type="submit" class="op-m-btn delete w-100">
+                                <i class="bi bi-trash3"></i> Hapus
                             </button>
-
                         </form>
-
                     </div>
-
                 </div>
-
             @empty
-
                 @include('admin.operator._empty')
-
             @endforelse
-
         </div>
-
     </div>
-
 </div>
 
 
 @push('styles')
-
 <style>
-
-    /* =========================================================
-       GLOBAL
-    ========================================================= */
-
-    .operator-header {
+    /* ===== HEADER ===== */
+    .op-header {
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
         gap: 20px;
     }
 
-
-    .page-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
-
-        display: flex;
+    .op-badge {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-
-        background: #e8f5ee;
-        color: #198754;
-
-        font-size: 17px;
-    }
-
-
-    .page-label {
+        gap: 8px;
+        margin-bottom: 10px;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: .08em;
-        color: #198754;
+        color: #0d6e4a;
     }
 
-
-    .page-title {
-        font-size: 28px;
-        font-weight: 750;
-        color: #17221b;
-        letter-spacing: -.5px;
-    }
-
-
-    .page-description {
-        color: #7a8580;
-        font-size: 14px;
-    }
-
-
-    /* =========================================================
-       ADD BUTTON
-    ========================================================= */
-
-    .btn-add-operator {
+    .op-badge i {
+        width: 28px;
+        height: 28px;
         display: inline-flex;
         align-items: center;
-        gap: 9px;
+        justify-content: center;
+        border-radius: 8px;
+        background: #e6f7ef;
+        color: #198754;
+        font-size: 14px;
+    }
 
+    .op-title {
+        font-size: 26px;
+        font-weight: 750;
+        color: #111827;
+        letter-spacing: -.4px;
+        margin-bottom: 4px;
+    }
+
+    .op-desc {
+        color: #6b7280;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* ===== ADD BUTTON ===== */
+    .btn-op-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 11px 18px;
-
+        background: linear-gradient(135deg, #198754, #157347);
+        color: #fff;
         border: none;
         border-radius: 10px;
-
-        background: #198754;
-        color: #fff;
-
         font-size: 14px;
         font-weight: 600;
-
-        box-shadow: 0 5px 14px rgba(25, 135, 84, .18);
-
-        transition: .2s ease;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, .25);
+        transition: all .2s ease;
+        text-decoration: none;
     }
 
-
-    .btn-add-operator:hover {
-        background: #157347;
-        color: #fff;
+    .btn-op-add:hover {
         transform: translateY(-1px);
-        box-shadow: 0 7px 18px rgba(25, 135, 84, .24);
+        box-shadow: 0 6px 16px rgba(25, 135, 84, .32);
+        color: #fff;
     }
 
-
-    /* =========================================================
-       SUCCESS
-    ========================================================= */
-
-    .success-alert {
+    /* ===== ALERT ===== */
+    .op-alert {
         display: flex;
         align-items: center;
         gap: 12px;
-
-        padding: 13px 16px;
-
-        background: #edf9f2;
-        border: 1px solid #d5f0df;
+        padding: 14px 16px;
         border-radius: 12px;
+        border: 1px solid transparent;
     }
 
+    .op-alert.success {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+    }
 
-    .success-icon {
+    .op-alert-icon {
         width: 32px;
         height: 32px;
-
+        border-radius: 50%;
+        background: #198754;
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        border-radius: 50%;
-
-        background: #198754;
-        color: #fff;
+        font-size: 15px;
+        flex-shrink: 0;
     }
 
-
-    .success-title {
+    .op-alert-title {
         font-size: 13px;
         font-weight: 700;
-        color: #146c43;
+        color: #065f46;
     }
 
-
-    .success-message {
+    .op-alert-msg {
         font-size: 13px;
-        color: #47715a;
+        color: #047857;
     }
 
-
-    /* =========================================================
-       SUMMARY
-    ========================================================= */
-
-    .summary-card {
+    /* ===== STAT CARDS ===== */
+    .op-stat {
         position: relative;
-
         display: flex;
         align-items: center;
         gap: 14px;
-
-        min-height: 90px;
-
-        padding: 17px 18px;
-
+        padding: 18px;
         background: #fff;
-
-        border: 1px solid #edf0ee;
+        border: 1px solid #e5e7eb;
         border-radius: 14px;
-
-        box-shadow: 0 3px 12px rgba(30, 45, 37, .045);
-
-        transition: .2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,.04);
+        transition: all .2s ease;
+        min-height: 88px;
     }
 
-
-    .summary-card:hover {
+    .op-stat:hover {
         transform: translateY(-2px);
-        box-shadow: 0 7px 18px rgba(30, 45, 37, .07);
+        box-shadow: 0 6px 16px rgba(0,0,0,.06);
     }
 
-
-    .summary-icon {
-        width: 48px;
-        height: 48px;
-
-        flex-shrink: 0;
-
+    .op-stat-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        border-radius: 12px;
-
-        font-size: 21px;
+        font-size: 20px;
+        flex-shrink: 0;
     }
 
+    .op-stat-icon.blue  { background: #eff6ff; color: #3b82f6; }
+    .op-stat-icon.green { background: #ecfdf5; color: #198754; }
+    .op-stat-icon.gray  { background: #f3f4f6; color: #6b7280; }
 
-    .summary-icon-blue {
-        background: #edf4ff;
-        color: #3b82f6;
-    }
-
-
-    .summary-icon-green {
-        background: #eaf8f0;
-        color: #198754;
-    }
-
-
-    .summary-icon-gray {
-        background: #f2f3f4;
-        color: #6c757d;
-    }
-
-
-    .summary-label {
+    .op-stat-label {
         font-size: 12px;
-        color: #7b8580;
+        color: #6b7280;
         margin-bottom: 2px;
     }
 
-
-    .summary-value {
-        font-size: 25px;
-        line-height: 1;
+    .op-stat-value {
+        font-size: 24px;
         font-weight: 750;
-        color: #18221c;
+        color: #111827;
+        line-height: 1;
     }
 
-
-    .summary-status {
+    .op-stat-badge {
         margin-left: auto;
-
-        padding: 5px 9px;
-
-        background: #eaf8f0;
-        color: #198754;
-
-        border-radius: 7px;
-
+        padding: 4px 9px;
+        border-radius: 6px;
         font-size: 11px;
         font-weight: 600;
     }
 
+    .op-stat-badge.green { background: #ecfdf5; color: #198754; }
+    .op-stat-badge.gray  { background: #f3f4f6; color: #6b7280; }
 
-    .summary-status-gray {
-        background: #f1f2f3;
-        color: #6c757d;
-    }
-
-
-    /* =========================================================
-       MAIN CARD
-    ========================================================= */
-
-    .operator-wrapper {
+    /* ===== MAIN CARD ===== */
+    .op-card {
         background: #fff;
-
-        border: 1px solid #e9eceb;
+        border: 1px solid #e5e7eb;
         border-radius: 16px;
-
         overflow: hidden;
-
-        box-shadow: 0 4px 15px rgba(30, 45, 37, .045);
+        box-shadow: 0 1px 3px rgba(0,0,0,.04);
     }
 
-
-    .operator-wrapper-header {
+    .op-card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        padding: 20px 22px;
-
-        border-bottom: 1px solid #edf0ee;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f1f5f9;
     }
 
-
-    .operator-title {
+    .op-card-title {
         font-size: 16px;
         font-weight: 700;
-        color: #1b241e;
+        color: #111827;
+        margin: 0 0 2px;
     }
 
-
-    .operator-subtitle {
+    .op-card-sub {
         font-size: 12px;
-        color: #89928d;
+        color: #9ca3af;
+        margin: 0;
     }
 
-
-    .operator-count {
-        padding: 6px 10px;
-
-        background: #f2f8f4;
+    .op-count {
+        padding: 5px 11px;
+        background: #ecfdf5;
         color: #198754;
-
         border-radius: 8px;
-
         font-size: 12px;
         font-weight: 600;
     }
 
-
-    /* =========================================================
-       TABLE
-    ========================================================= */
-
-    .operator-table thead {
-        background: #f8faf9;
+    /* ===== TABLE ===== */
+    .op-table thead {
+        background: #f8fafc;
     }
 
-
-    .operator-table thead th {
-        padding: 12px 14px;
-
-        border-bottom: 1px solid #e9eeeb;
-
-        color: #79837e;
-
-        font-size: 10px;
+    .op-table thead th {
+        padding: 11px 14px;
+        font-size: 11px;
         font-weight: 700;
-
         text-transform: uppercase;
-        letter-spacing: .07em;
-
+        letter-spacing: .06em;
+        color: #94a3b8;
+        border-bottom: 1px solid #e2e8f0;
         white-space: nowrap;
     }
 
-
-    .operator-table tbody tr {
-        border-bottom: 1px solid #f0f2f1;
-
+    .op-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
         transition: background .15s ease;
     }
 
-
-    .operator-table tbody tr:last-child {
+    .op-table tbody tr:last-child {
         border-bottom: none;
     }
 
-
-    .operator-table tbody tr:hover {
-        background: #fbfcfb;
+    .op-table tbody tr:hover {
+        background: #f8fafc;
     }
 
-
-    .operator-table td {
-        padding: 15px 14px;
-
-        color: #4c5751;
-
+    .op-table td {
+        padding: 14px;
         font-size: 13px;
+        color: #374151;
+        vertical-align: middle;
     }
 
-
-    .row-number {
-        color: #9ba49f;
+    .op-no {
         font-size: 12px;
         font-weight: 600;
+        color: #9ca3af;
     }
 
-
-    /* =========================================================
-       OPERATOR INFO
-    ========================================================= */
-
-    .operator-info {
+    /* User */
+    .op-user {
         display: flex;
         align-items: center;
-        gap: 11px;
+        gap: 12px;
     }
 
-
-    .operator-avatar {
+    .op-avatar {
         width: 40px;
         height: 40px;
-
-        flex-shrink: 0;
-
+        border-radius: 10px;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        font-size: 15px;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        border-radius: 11px;
-
-        background: #e9f6ef;
-        color: #198754;
-
-        font-size: 15px;
-        font-weight: 750;
-
-        border: 1px solid #d8eee1;
+        flex-shrink: 0;
     }
 
-
-    .operator-name {
-        color: #202923;
-        font-size: 13px;
+    .op-name {
+        font-size: 13.5px;
         font-weight: 700;
+        color: #111827;
     }
 
-
-    .operator-role {
-        margin-top: 2px;
-
-        color: #929b96;
-
+    .op-role {
         font-size: 11px;
+        color: #9ca3af;
+        margin-top: 1px;
     }
 
-
-    /* =========================================================
-       USERNAME
-    ========================================================= */
-
-    .username {
-        display: inline-flex;
-        align-items: center;
-
-        padding: 5px 8px;
-
-        background: #f5f7f6;
-
-        border-radius: 7px;
-
-        color: #59635e;
-
-        font-size: 12px;
-        font-family: monospace;
-    }
-
-
-    /* =========================================================
-       EMAIL
-    ========================================================= */
-
-    .email-text {
-        display: flex;
-        align-items: center;
-
-        color: #68736d;
-
-        font-size: 12px;
-    }
-
-
-    .email-text i {
-        color: #9ba49f;
-    }
-
-
-    /* =========================================================
-       STATUS
-    ========================================================= */
-
-    .status {
+    /* Username */
+    .op-username {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-
-        padding: 5px 9px;
-
-        border-radius: 7px;
-
-        font-size: 11px;
-        font-weight: 650;
+        padding: 4px 9px;
+        background: #f1f5f9;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        color: #475569;
     }
 
+    .op-username i {
+        font-size: 12px;
+        color: #94a3b8;
+    }
 
-    .status-indicator {
+    /* Email */
+    .op-email {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        color: #64748b;
+    }
+
+    .op-email i {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    /* Status */
+    .op-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+    }
+
+    .op-status .dot {
         width: 6px;
         height: 6px;
-
         border-radius: 50%;
     }
 
-
-    .status-active {
-        background: #eaf8f0;
-        color: #198754;
+    .op-status.active {
+        background: #ecfdf5;
+        color: #047857;
     }
 
-
-    .status-active .status-indicator {
-        background: #22a06b;
+    .op-status.active .dot {
+        background: #10b981;
     }
 
-
-    .status-inactive {
-        background: #f2f3f4;
-        color: #747c78;
+    .op-status.inactive {
+        background: #f1f5f9;
+        color: #64748b;
     }
 
-
-    .status-inactive .status-indicator {
-        background: #9da4a0;
+    .op-status.inactive .dot {
+        background: #94a3b8;
     }
 
-
-    /* =========================================================
-       ACTION
-    ========================================================= */
-
-    .action-buttons {
+    /* Actions */
+    .op-actions {
         display: inline-flex;
-        align-items: center;
-        gap: 7px;
+        gap: 6px;
     }
 
-
-    .action-btn {
+    .op-btn {
         width: 34px;
         height: 34px;
-
+        border-radius: 8px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-
-        border-radius: 8px;
-
+        border: 1px solid transparent;
         background: #fff;
-
         font-size: 14px;
-
-        transition: .18s ease;
+        transition: all .18s ease;
+        cursor: pointer;
     }
 
-
-    .action-edit {
-        color: #d98b00;
-        border: 1px solid #f3dfb4;
+    .op-btn.edit {
+        color: #d97706;
+        border-color: #fde68a;
     }
 
-
-    .action-edit:hover {
-        background: #fff6e5;
-        color: #b87500;
+    .op-btn.edit:hover {
+        background: #fffbeb;
+        color: #b45309;
     }
 
-
-    .action-delete {
-        color: #dc3545;
-        border: 1px solid #f2c6cb;
+    .op-btn.delete {
+        color: #ef4444;
+        border-color: #fecaca;
     }
 
-
-    .action-delete:hover {
-        background: #fff0f1;
-        color: #bb2d3b;
+    .op-btn.delete:hover {
+        background: #fef2f2;
+        color: #dc2626;
     }
 
-
-    /* =========================================================
-       MOBILE
-    ========================================================= */
-
-    .mobile-operator-list {
+    /* ===== MOBILE ===== */
+    .op-mobile {
         padding: 12px;
-        background: #f8faf9;
+        background: #f8fafc;
     }
 
-
-    .mobile-operator-card {
-        padding: 15px;
-
+    .op-m-card {
         background: #fff;
-
-        border: 1px solid #e9eeeb;
-        border-radius: 13px;
-
-        margin-bottom: 11px;
-
-        box-shadow: 0 2px 7px rgba(30, 45, 37, .035);
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.03);
     }
 
-
-    .mobile-operator-card:last-child {
+    .op-m-card:last-child {
         margin-bottom: 0;
     }
 
-
-    .mobile-top {
+    .op-m-top {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-
         gap: 10px;
     }
 
-
-    .mobile-email {
+    .op-m-email {
         display: flex;
         align-items: center;
         gap: 8px;
-
-        margin-top: 14px;
+        margin-top: 12px;
         padding-top: 12px;
-
-        border-top: 1px solid #f0f2f1;
-
-        color: #707a75;
-
-        font-size: 12px;
-
+        border-top: 1px solid #f1f5f9;
+        font-size: 12.5px;
+        color: #64748b;
         overflow-wrap: anywhere;
     }
 
-
-    .mobile-email i {
-        color: #9ba49f;
+    .op-m-email i {
+        color: #94a3b8;
     }
 
-
-    .mobile-actions {
+    .op-m-actions {
         display: flex;
         gap: 8px;
-
-        margin-top: 13px;
+        margin-top: 12px;
     }
 
-
-    .mobile-action {
+    .op-m-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
-
-        min-height: 37px;
-
+        min-height: 38px;
         padding: 7px 12px;
-
-        border-radius: 8px;
-
-        font-size: 12px;
+        border-radius: 9px;
+        font-size: 12.5px;
         font-weight: 600;
-
         text-decoration: none;
-
-        transition: .18s ease;
+        border: 1px solid transparent;
+        transition: all .18s ease;
+        cursor: pointer;
     }
 
-
-    .mobile-edit {
+    .op-m-btn.edit {
         flex: 1;
-
-        background: #fff8ea;
-        border: 1px solid #f0d9a9;
-
-        color: #b87800;
+        background: #fffbeb;
+        border-color: #fde68a;
+        color: #b45309;
     }
 
-
-    .mobile-edit:hover {
-        background: #fff0ce;
-        color: #9c6700;
+    .op-m-btn.edit:hover {
+        background: #fef3c7;
     }
 
-
-    .mobile-delete {
-        background: #fff0f1;
-        border: 1px solid #f1c8cd;
-
-        color: #dc3545;
+    .op-m-btn.delete {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
     }
 
-
-    .mobile-delete:hover {
-        background: #ffe2e5;
-        color: #bb2d3b;
+    .op-m-btn.delete:hover {
+        background: #fee2e2;
     }
 
-
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
-
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 767.98px) {
-
-        .operator-header {
-            align-items: stretch;
+        .op-header {
             flex-direction: column;
+            align-items: stretch;
         }
 
-
-        .page-title {
+        .op-title {
             font-size: 22px;
         }
 
-
-        .page-description {
-            font-size: 12px;
-            line-height: 1.6;
+        .op-desc {
+            font-size: 13px;
         }
 
-
-        .btn-add-operator {
+        .btn-op-add {
             width: 100%;
             justify-content: center;
         }
 
-
-        .summary-card {
-            min-height: 78px;
+        .op-stat {
+            min-height: 76px;
+            padding: 15px;
         }
 
-
-        .summary-icon {
-            width: 42px;
-            height: 42px;
+        .op-stat-icon {
+            width: 40px;
+            height: 40px;
             font-size: 18px;
         }
 
-
-        .summary-value {
+        .op-stat-value {
             font-size: 21px;
         }
 
-
-        .summary-status {
+        .op-stat-badge {
             font-size: 10px;
         }
 
-
-        .operator-wrapper-header {
-            padding: 16px;
+        .op-card-header {
+            padding: 15px 16px;
         }
-
-
-        .operator-title {
-            font-size: 14px;
-        }
-
-
-        .operator-subtitle {
-            font-size: 11px;
-        }
-
-
-        .operator-count {
-            font-size: 10px;
-        }
-
     }
 
-
     @media (max-width: 400px) {
-
-        .container-fluid {
-            padding-left: 12px !important;
-            padding-right: 12px !important;
-        }
-
-
-        .summary-card {
-            padding: 14px;
-        }
-
-
-        .summary-status {
+        .op-stat-badge {
             display: none;
         }
 
-
-        .mobile-operator-card {
-            padding: 13px;
+        .op-avatar {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
         }
 
-
-        .operator-avatar {
-            width: 38px;
-            height: 38px;
+        .op-name {
+            font-size: 13px;
         }
-
-
-        .operator-name {
-            font-size: 12px;
-        }
-
     }
-
 </style>
-
 @endpush
 
 @endsection
